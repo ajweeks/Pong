@@ -2,16 +2,16 @@ package ca.liqwidice.pong;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.geom.Ellipse2D;
+import java.awt.Rectangle;
 
-public class Ball extends Ellipse2D.Double {
+public class Ball extends Rectangle {
 	private static final long serialVersionUID = 1L;
 
 	private double xv, yv;
 	private boolean offScreen = false;
 
-	public Ball(double x, double y, double xv, double yv, double diameter) {
-		super(x, y, diameter, diameter);
+	public Ball(int x, int y, double xv, double yv, int width) {
+		super(x, y, width, width);
 		this.xv = xv;
 		this.yv = yv;
 	}
@@ -25,7 +25,7 @@ public class Ball extends Ellipse2D.Double {
 
 	public void render(Graphics g) {
 		g.setColor(Color.white);
-		g.fillOval((int) x, (int) y, (int) width, (int) height);
+		g.fillRect(x, y, width, height);
 	}
 
 	public void clamp() {
@@ -42,8 +42,8 @@ public class Ball extends Ellipse2D.Double {
 	}
 
 	/** @return a ball at x, y with a randomized xv and yv */
-	public static Ball newBall(double x, double y, double diameter) {
-		return new Ball(x, y, Level.BALL_SPEED, Math.random() * (Level.BALL_SPEED - 1) + 1, diameter);
+	public static Ball newBall(int x, int y, int width) {
+		return new Ball(x, y, Level.BALL_SPEED, Math.random() * (Level.BALL_SPEED - 1) + 1, 25);
 	}
 
 	public boolean isOffScreen() {

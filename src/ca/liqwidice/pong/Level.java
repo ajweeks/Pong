@@ -31,7 +31,10 @@ public class Level {
 		if (ball.isOffScreen()) {
 			resetGame();
 		} else if (ball.intersects(player)) {
-			if (ball.x < player.x + player.width - 5) {//ball is hitting top or bottom of paddle, don't bounce it
+			if (ball.x < player.x + player.width - BALL_SPEED) { //ball is hitting top or bottom of paddle
+				if (ball.y + ball.height / 2 > player.y + player.height / 2) ball.y += BALL_SPEED;
+				else ball.y -= BALL_SPEED + 1;
+				ball.setYv(-ball.getYv());
 				return;
 			}
 			double angle = ((player.y + (player.height / 2)) - (ball.y + (ball.height / 2))) / 7;
@@ -39,7 +42,10 @@ public class Level {
 			ball.setXv(-ball.getXv());
 			ball.setYv(-angle);
 		} else if (ball.intersects(ai)) {
-			if (ball.x + ball.width > ai.x + 5) {//ball is hitting top or bottom of paddle, don't bounce it
+			if (ball.x + ball.width > ai.x + BALL_SPEED) { //ball is hitting top or bottom of paddle
+				if (ball.y + ball.height / 2 > ai.y + ai.height / 2) ball.y += BALL_SPEED;
+				else ball.y -= BALL_SPEED + 1;
+				ball.setYv(-ball.getYv());
 				return;
 			}
 			double angle = ((ai.y + (ai.height / 2)) - (ball.y + (ball.height / 2))) / 7;
@@ -65,7 +71,10 @@ public class Level {
 		g.drawString(playerScore + "", Pong.SIZE.width / 2 - 50 - g.getFontMetrics().stringWidth(playerScore + ""), 24);
 		g.drawString(aiScore + "", Pong.SIZE.width / 2 + 50, 24);
 
-		//TODO draw midfield lines
+		g.setColor(Color.WHITE);
+		for (int i = 0; i < 7; i++) {
+			g.fillRect(Pong.SIZE.width / 2 - 6, i * 65 + 22, 12, 45);
+		}
 
 		if (paused) {
 			g.setColor(new Color(25, 25, 25, 150));
