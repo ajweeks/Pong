@@ -5,7 +5,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
-public class Input implements KeyListener {
+import ca.liqwidice.pong.input.Mouse;
+
+public class Keyboard implements KeyListener {
 
 	public class Key {
 		public boolean clicked, down;
@@ -34,23 +36,18 @@ public class Input implements KeyListener {
 	public Key esc = new Key();
 
 	public void update() {
-		for(int i = 0; i < keys.size(); i++) {
+		for (int i = 0; i < keys.size(); i++) {
 			keys.get(i).update();
 		}
 	}
-	
-	public void releaseAll() {
-		for (int i = 0; i < keys.size(); i++) {
-			keys.get(i).clicked = false;
-			keys.get(i).down = false;
-		}
-	}
 
-	public Input(Canvas canvas) {
+	public Keyboard(Canvas canvas) {
 		canvas.addKeyListener(this);
 	}
 
 	private void keyUpdated(KeyEvent e, boolean pressed) {
+		Mouse.setMouseStill(true);
+
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
 		case KeyEvent.VK_UP:

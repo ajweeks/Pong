@@ -1,13 +1,13 @@
 package ca.liqwidice.pong;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 
 public class Level {
 
-	public static final double BALL_SPEED = 5.5;
-	public static final double PADDLE_SPEED = 4.75;
+	public static final double BALL_SPEED = 9.0;
+	public static final double PLAYER_PADDLE_SPEED = 8.0;
+	public static final double AI_PADDLE_SPEED = 4.0;
 
 	private Ball ball;
 	private PlayerPaddle player;
@@ -16,24 +16,24 @@ public class Level {
 	private int playerScore = 0, aiScore = 0;
 
 	public Level() {
-		ball = Ball.newBall(200, 200, 30);
-		player = new PlayerPaddle(50, 120, 25, 100);
-		ai = new AIPaddle(Pong.SIZE.width - 75, 120, 25, 100);
+		ball = Ball.newBall(false);
+		player = new PlayerPaddle(50, Pong.SIZE.height / 2 - 50, 25, 100);
+		ai = new AIPaddle(Pong.SIZE.width - 75, Pong.SIZE.height / 2 - 50, 25, 100);
 	}
 
 	public void update() {
 		if (paused) return;
 
-		ball.update();
 		player.update();
+		ball.update();
 		ai.update(ball);
 
 		if (ball.isOffScreen()) {
 			resetGame();
 		} else if (ball.intersects(player)) {
 			if (ball.x < player.x + player.width - BALL_SPEED) { //ball is hitting top or bottom of paddle
-				if (ball.y + ball.height / 2 > player.y + player.height / 2) ball.y += BALL_SPEED;
-				else ball.y -= BALL_SPEED + 1;
+				if (ball.y + ball.height / 2 > player.y + player.height / 2) ball.y -= BALL_SPEED;
+				else ball.y += BALL_SPEED + 1;
 				ball.setYv(-ball.getYv());
 				return;
 			}
@@ -41,10 +41,11 @@ public class Level {
 			ball.x = player.x + player.width;
 			ball.setXv(-ball.getXv());
 			ball.setYv(-angle);
+			Sound.boop.play();
 		} else if (ball.intersects(ai)) {
 			if (ball.x + ball.width > ai.x + BALL_SPEED) { //ball is hitting top or bottom of paddle
-				if (ball.y + ball.height / 2 > ai.y + ai.height / 2) ball.y += BALL_SPEED;
-				else ball.y -= BALL_SPEED + 1;
+				if (ball.y + ball.height / 2 > ai.y + ai.height / 2) ball.y -= BALL_SPEED;
+				else ball.y += BALL_SPEED + 1;
 				ball.setYv(-ball.getYv());
 				return;
 			}
@@ -52,13 +53,26 @@ public class Level {
 			ball.x = ai.x - ball.width;
 			ball.setXv(-ball.getXv());
 			ball.setYv(-angle);
+			Sound.boop.play();
 		}
 	}
 
 	private void resetGame() {
+		int aiScoreBefore = aiScore;
+		int playerScoreBefore = playerScore;
 		if (ball.x - ball.width < 0) aiScore++;
 		else if (ball.x > Pong.SIZE.width) playerScore++;
-		ball = Ball.newBall(200, 200, 30);
+		if (aiScore > aiScoreBefore) {
+			Sound.lose.play();
+			ball = Ball.newBall(false);
+		} else if (playerScore > playerScoreBefore) {
+			Sound.win.play();
+			ball = Ball.newBall(true);
+		} else {
+			System.out.println("no one scored!!");
+			ball = Ball.newBall(false);
+			return;
+		}
 	}
 
 	public void render(Graphics g) {
@@ -66,14 +80,13 @@ public class Level {
 		player.render(g);
 		ai.render(g);
 
-		g.setFont(new Font("Consolas", Font.BOLD, 32));
+		g.setFont(Pong.font32);
 		g.setColor(Color.WHITE);
 		g.drawString(playerScore + "", Pong.SIZE.width / 2 - 50 - g.getFontMetrics().stringWidth(playerScore + ""), 24);
 		g.drawString(aiScore + "", Pong.SIZE.width / 2 + 50, 24);
 
-		g.setColor(Color.WHITE);
-		for (int i = 0; i < 7; i++) {
-			g.fillRect(Pong.SIZE.width / 2 - 6, i * 65 + 22, 12, 45);
+		for (int i = 0; i < 8; i++) {
+			g.fillRect(Pong.SIZE.width / 2 - 6, i * 65 - 10, 12, 45);
 		}
 
 		if (paused) {

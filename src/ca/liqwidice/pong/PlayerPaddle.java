@@ -1,10 +1,8 @@
 package ca.liqwidice.pong;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import ca.liqwidice.pong.input.Mouse;
 
-public class PlayerPaddle extends Rectangle {
+public class PlayerPaddle extends Paddle {
 	private static final long serialVersionUID = 1L;
 
 	public PlayerPaddle(int x, int y, int width, int height) {
@@ -12,20 +10,15 @@ public class PlayerPaddle extends Rectangle {
 	}
 
 	public void update() {
-		if (Pong.input.up.down) y -= Level.PADDLE_SPEED;
-		else if (Pong.input.down.down) y += Level.PADDLE_SPEED;
+		if (Mouse.isMouseStill()) {
+			if (Pong.keyboard.up.down) y -= Level.PLAYER_PADDLE_SPEED;
+			else if (Pong.keyboard.down.down) y += Level.PLAYER_PADDLE_SPEED;
+		} else if (Pong.mouse.getY() < y + height / 2) { //mouse is above paddle's midpoint
+			y = (int) Math.min(Level.PLAYER_PADDLE_SPEED, y - Pong.mouse.getY());
+		} else if (Pong.mouse.getY() > y + height / 2) { //mouse is below paddle's midpoint
+			y = (int) Math.min(Level.PLAYER_PADDLE_SPEED, Pong.mouse.getY() - y);
+		}
 
 		clamp();
 	}
-
-	private void clamp() {
-		if (y > Pong.SIZE.height - height) y = Pong.SIZE.height - height;
-		else if (y < 0) y = 0;
-	}
-
-	public void render(Graphics g) {
-		g.setColor(Color.WHITE);
-		g.fillRect(x, y, width, height);
-	}
-
 }

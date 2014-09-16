@@ -9,14 +9,22 @@ import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
 
+import ca.liqwidice.pong.input.Mouse;
+import ca.liqwidice.pong.state.GameState;
+import ca.liqwidice.pong.state.MainMenuState;
+import ca.liqwidice.pong.state.StateManager;
+
 public class Pong extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
 	public static final Dimension SIZE = new Dimension(720, 480);
-	public static Input input;
+	public static Keyboard keyboard;
+	public static Mouse mouse;
+	public static Font font32 = new Font("Consolas", Font.BOLD, 32);
 
+	
 	private JFrame frame;
-	private Level level;
+	private StateManager sm;
 
 	private boolean running = false;
 
@@ -32,10 +40,13 @@ public class Pong extends Canvas implements Runnable {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 
-		input = new Input(this);
+		keyboard = new Keyboard(this);
+		mouse = new Mouse(this);
 
-		level = new Level();
-		
+		sm = new StateManager();
+		sm.addState(new MainMenuState(this));
+		sm.addState(new GameState());
+
 		requestFocus();
 	}
 
@@ -44,19 +55,15 @@ public class Pong extends Canvas implements Runnable {
 	}
 
 	private void update() {
-		if(input.esc.clicked) level.setPaused(!level.isPaused());
-		level.update();
-		input.update();
+		sm.update();
 	}
 
 	private void render(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, SIZE.width, SIZE.height);
-
-		level.render(g);
+		sm.render(g);
 	}
 
-	@Override
 	public void run() {
 		running = true;
 
@@ -71,7 +78,7 @@ public class Pong extends Canvas implements Runnable {
 
 			update();
 			frames++;
-			
+
 			BufferStrategy buffer = getBufferStrategy();
 			if (buffer == null) {
 				createBufferStrategy(2);
@@ -95,10 +102,20 @@ public class Pong extends Canvas implements Runnable {
 			buffer.show();
 
 			try {
-				Thread.sleep(15);
+				Thread.sleep(15); //TODO implement an actual game loop
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+		frame.dispose();
+		System.exit(0);
+	}
+
+	public StateManager getStateManager() {
+		return sm;
+	}
+
+	public void stop() {
+		running = false;
 	}
 }

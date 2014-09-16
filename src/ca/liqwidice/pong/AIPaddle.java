@@ -1,10 +1,6 @@
 package ca.liqwidice.pong;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-
-public class AIPaddle extends Rectangle {
+public class AIPaddle extends Paddle {
 	private static final long serialVersionUID = 1L;
 
 	public AIPaddle(int x, int y, int width, int height) {
@@ -12,19 +8,12 @@ public class AIPaddle extends Rectangle {
 	}
 
 	public void update(Ball ball) {
-		if (ball.y > this.y + height / 2 && ball.getYv() > 0) y += Level.PADDLE_SPEED;
-		else if (ball.y < this.y + height / 2 && ball.getYv() < 0) y -= Level.PADDLE_SPEED;
-
+		//		if (ball.y + ball.height / 2 > y + height / 2) { //ball is below paddle
+		y = (int) Math.min(Level.AI_PADDLE_SPEED, Math.abs((ball.y + ball.height / 2) - y + height / 2));
+		//		} else if (ball.y + ball.height / 2 < y + height / 2) { //ball is above paddle
+		//			y = (int) Math.min(y + height / 2 - Level.AI_PADDLE_SPEED, (ball.y + ball.height / 2) - y + height / 2);
+		//		}
 		clamp();
 	}
 
-	private void clamp() {
-		if (y > Pong.SIZE.height - height) y = Pong.SIZE.height - height;
-		else if (y < 0) y = 0;
-	}
-
-	public void render(Graphics g) {
-		g.setColor(Color.WHITE);
-		g.fillRect(x, y, width, height);
-	}
 }

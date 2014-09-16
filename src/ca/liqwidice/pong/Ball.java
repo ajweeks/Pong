@@ -35,15 +35,20 @@ public class Ball extends Rectangle {
 		if (y > Pong.SIZE.height - height) {
 			y = Pong.SIZE.height - height;
 			yv = -yv;
+			Sound.boop2.play();
 		} else if (y < 0) {
 			y = 0;
 			yv = -yv;
+			Sound.boop2.play();
 		}
 	}
 
 	/** @return a ball at x, y with a randomized xv and yv */
-	public static Ball newBall(int x, int y, int width) {
-		return new Ball(x, y, Level.BALL_SPEED, Math.random() * (Level.BALL_SPEED - 1) + 1, 25);
+	public static Ball newBall(boolean towardsPlayer) {
+		double yv = (Math.random() * (Level.BALL_SPEED) - Level.BALL_SPEED / 2);
+		double xv = Level.BALL_SPEED;
+		if (towardsPlayer) xv = -xv;
+		return new Ball(345, 225, xv, yv, 20);
 	}
 
 	public boolean isOffScreen() {
