@@ -7,14 +7,14 @@ import ca.liqwidice.pong.Pong;
 
 public class GameState extends BasicState {
 
-	private Level level = new Level();
-	
-	public GameState() {
-		
+	private Level level;
+
+	public GameState(float difficulty) {
+		level = new Level(difficulty);
 	}
-	
+
 	public void update() {
-		if(Pong.keyboard.esc.clicked) level.setPaused(!level.isPaused());
+		if (Pong.keyboard.esc.clicked) level.setPaused(!level.isPaused());
 		level.update();
 		Pong.keyboard.update();
 	}

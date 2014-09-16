@@ -10,7 +10,10 @@ import ca.liqwidice.pong.Pong;
 public class MainMenuState extends BasicState {
 
 	private static final int PLAY = 0;
-	private static final int QUIT = 1;
+	private static final int EASY = 1;
+	private static final int MED = 2;
+	private static final int HARD = 3;
+	private static final int QUIT = 4;
 
 	private ButtonManager manager = new ButtonManager();
 	private Pong pong;
@@ -19,14 +22,26 @@ public class MainMenuState extends BasicState {
 		this.pong = pong;
 
 		manager.addButton(new Button("PLAY", Pong.SIZE.width / 2 - 150 / 2, 0 + 145, 150, 85));
+		manager.addButton(new Button("EASY", Pong.SIZE.width / 2 - 150 / 2, 0 + 145, 50, 85));
+		manager.addButton(new Button("MEDIUM", Pong.SIZE.width / 2 - 0, 0 + 145, 50, 85));
+		manager.addButton(new Button("HARD", Pong.SIZE.width / 2 + 150 / 2, 0 + 145, 50, 85));
+
 		manager.addButton(new Button("QUIT", Pong.SIZE.width / 2 - 150 / 2, 95 + 145, 150, 85));
 	}
 
 	public void update() {
 		manager.updateAll();
-		if (manager.getButton(PLAY).isClicked()) {
-			pong.getStateManager().enterState(StateManager.GAME_STATE);
-		} else if (manager.getButton(QUIT).isClicked()) {
+		if (manager.getButton(PLAY).isHovering()) {
+			manager.getButton(PLAY).setVisible(false);
+			if (manager.getButton(EASY).isClicked()) {
+				pong.getStateManager().enterState(StateManager.GAME_STATE_EASY);
+			} else if (manager.getButton(MED).isClicked()) {
+				pong.getStateManager().enterState(StateManager.GAME_STATE_MED);
+			} else if (manager.getButton(HARD).isClicked()) {
+				pong.getStateManager().enterState(StateManager.GAME_STATE_HARD);
+			}
+		} else manager.getButton(PLAY).setVisible(true); //play isn't being hovered over
+		if (manager.getButton(QUIT).isClicked()) {
 			pong.stop();
 		}
 	}

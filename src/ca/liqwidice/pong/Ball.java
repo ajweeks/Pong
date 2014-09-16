@@ -9,9 +9,11 @@ public class Ball extends Rectangle {
 
 	private double xv, yv;
 	private boolean offScreen = false;
+	private Level level;
 
-	public Ball(int x, int y, double xv, double yv, int width) {
+	public Ball(Level level, int x, int y, double xv, double yv, int width) {
 		super(x, y, width, width);
+		this.level = level;
 		this.xv = xv;
 		this.yv = yv;
 	}
@@ -44,11 +46,11 @@ public class Ball extends Rectangle {
 	}
 
 	/** @return a ball at x, y with a randomized xv and yv */
-	public static Ball newBall(boolean towardsPlayer) {
-		double yv = (Math.random() * (Level.BALL_SPEED) - Level.BALL_SPEED / 2);
-		double xv = Level.BALL_SPEED;
+	public static Ball newBall(Level level, boolean towardsPlayer) {
+		double yv = (Math.random() * (level.getBallXv()) - level.getBallXv() / 2);
+		double xv = level.getBallXv();
 		if (towardsPlayer) xv = -xv;
-		return new Ball(345, 225, xv, yv, 20);
+		return new Ball(level, 345, 225, xv, yv, 20);
 	}
 
 	public boolean isOffScreen() {

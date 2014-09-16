@@ -7,7 +7,7 @@ public class Button {
 
 	private String text;
 	private int x, y, width, height;
-	private boolean hover, clicked, down;
+	private boolean hover = false, clicked = false, down = false, visible = true;
 	private Color col, hovcol;
 
 	public Button(String text, int x, int y, int height, int width, Color col, Color hovcol) { //TODO add text rendering
@@ -39,6 +39,7 @@ public class Button {
 	}
 
 	public void render(Graphics g) {
+		if (!visible) return;
 		if (hover) g.setColor(col);
 		else g.setColor(hovcol);
 		g.fillRect(x, y, width, height);
@@ -46,6 +47,18 @@ public class Button {
 		g.setColor(Color.WHITE);
 		g.setFont(Pong.font32);
 		g.drawString(text, x + (width / 2) - (g.getFontMetrics().stringWidth(text) / 2), y + (height / 2) + 8);
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+
+	public boolean isHovering() {
+		return hover;
 	}
 
 	public boolean isClicked() {

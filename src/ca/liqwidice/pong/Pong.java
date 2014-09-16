@@ -22,7 +22,6 @@ public class Pong extends Canvas implements Runnable {
 	public static Mouse mouse;
 	public static Font font32 = new Font("Consolas", Font.BOLD, 32);
 
-	
 	private JFrame frame;
 	private StateManager sm;
 
@@ -45,7 +44,9 @@ public class Pong extends Canvas implements Runnable {
 
 		sm = new StateManager();
 		sm.addState(new MainMenuState(this));
-		sm.addState(new GameState());
+		sm.addState(new GameState(Level.EASY));
+		sm.addState(new GameState(Level.MED));
+		sm.addState(new GameState(Level.HARD));
 
 		requestFocus();
 	}

@@ -15,7 +15,7 @@ public class Sound {
 	public static Sound win = new Sound("res/sounds/win.wav");
 
 	private String path;
-	private float volume = 5.0f;
+	private float volume = 1.0f;
 
 	public Sound(String path) {
 		this.path = path;
@@ -27,15 +27,11 @@ public class Sound {
 			AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(path));
 			clip.open(inputStream);
 			FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-			gainControl.setValue(volume);
+			gainControl.setValue(0.1f);
 			clip.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void setVolume(float volume) {
-		this.volume = volume;
 	}
 
 	public float getVolume() {
