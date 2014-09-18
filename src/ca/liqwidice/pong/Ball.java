@@ -8,17 +8,19 @@ public class Ball extends Rectangle {
 	private static final long serialVersionUID = 1L;
 
 	private double xv, yv;
+	private int lastX, lastY;
 	private boolean offScreen = false;
-	private Level level;
 
-	public Ball(Level level, int x, int y, double xv, double yv, int width) {
+	public Ball(int x, int y, double xv, double yv, int width) {
 		super(x, y, width, width);
-		this.level = level;
 		this.xv = xv;
 		this.yv = yv;
 	}
 
 	public void update() {
+		lastX = x;
+		lastY = y;
+
 		x += xv;
 		y += yv;
 
@@ -46,15 +48,23 @@ public class Ball extends Rectangle {
 	}
 
 	/** @return a ball at x, y with a randomized xv and yv */
-	public static Ball newBall(Level level, boolean towardsPlayer) {
-		double yv = (Math.random() * (level.getBallXv()) - level.getBallXv() / 2);
-		double xv = level.getBallXv();
+	public static Ball newBall(Level level, boolean towardsPlayer, float ballXv) {
+		double yv = (Math.random() * (ballXv - ballXv / 2));
+		double xv = ballXv;
 		if (towardsPlayer) xv = -xv;
-		return new Ball(level, 345, 225, xv, yv, 20);
+		return new Ball(345, 225, xv, yv, 20);
 	}
 
 	public boolean isOffScreen() {
 		return offScreen;
+	}
+
+	public int getLastX() {
+		return lastX;
+	}
+
+	public int getLastY() {
+		return lastY;
 	}
 
 	public double getXv() {

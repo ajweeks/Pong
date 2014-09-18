@@ -17,9 +17,9 @@ public class PlayerPaddle extends Paddle {
 			if (Pong.keyboard.up.down) y -= level.getPlayerPaddleSpeed();
 			else if (Pong.keyboard.down.down) y += level.getPlayerPaddleSpeed();
 		} else if (Pong.mouse.getY() < y + height / 2) { //mouse is above paddle's midpoint
-			y = (int) Math.min(level.getPlayerPaddleSpeed(), y - Pong.mouse.getY());
+			y = (int) Math.min(y - level.getPlayerPaddleSpeed(), y - Pong.mouse.getY());
 		} else if (Pong.mouse.getY() > y + height / 2) { //mouse is below paddle's midpoint
-			y = (int) Math.min(level.getPlayerPaddleSpeed(), Pong.mouse.getY() - y);
+			y = (int) Math.min(y + level.getPlayerPaddleSpeed(), Pong.mouse.getY() - y);
 		}
 
 		clamp();

@@ -11,11 +11,25 @@ public class AIPaddle extends Paddle {
 	}
 
 	public void update(Ball ball) {
-		//		if (ball.y + ball.height / 2 > y + height / 2) { //ball is below paddle
-		y = (int) Math.min(level.getAiPaddleSpeed(), Math.abs((ball.y + ball.height / 2) - y + height / 2));
-		//		} else if (ball.y + ball.height / 2 < y + height / 2) { //ball is above paddle
-		//			y = (int) Math.min(y + height / 2 - Level.AI_PADDLE_SPEED, (ball.y + ball.height / 2) - y + height / 2);
-		//		}
+		int ballMid = ball.y + ball.height / 2;
+		int playerMid = y + height / 2;
+		int difference = Math.abs(ballMid - playerMid);
+
+		if (ballMid > playerMid) { //ball is below paddle
+			if (level.getAiPaddleSpeed() < difference) {
+				y += level.getAiPaddleSpeed();
+			} else {
+				y += difference;
+			}
+		} else if (ballMid < playerMid) {
+			if (level.getAiPaddleSpeed() < difference) {
+				y -= level.getAiPaddleSpeed();
+			} else {
+				y -= difference;
+			}
+			//y = (int) Math.min(y - level.getAiPaddleSpeed(), (y + height / 2) - (ball.y + ball.height / 2));
+		}
+
 		clamp();
 	}
 
