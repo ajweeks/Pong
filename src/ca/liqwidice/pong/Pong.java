@@ -9,6 +9,7 @@ import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
 
+import ca.liqwidice.pong.input.Keyboard;
 import ca.liqwidice.pong.input.Mouse;
 import ca.liqwidice.pong.state.GameState;
 import ca.liqwidice.pong.state.MainMenuState;

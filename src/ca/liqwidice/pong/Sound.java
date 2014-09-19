@@ -14,8 +14,9 @@ public class Sound {
 	public static Sound lose = new Sound("res/sounds/lose.wav");
 	public static Sound win = new Sound("res/sounds/win.wav");
 
+	private static float volume = 1.0f;
+
 	private String path;
-	private float volume = 1.0f;
 
 	public Sound(String path) {
 		this.path = path;
@@ -32,6 +33,14 @@ public class Sound {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void increaseVolume() {
+		if (volume++ > 6.0) volume = 6.0f;
+	}
+
+	public static void decreaseVolume() {
+		if (volume-- < 0) volume = 0;
 	}
 
 	public float getVolume() {

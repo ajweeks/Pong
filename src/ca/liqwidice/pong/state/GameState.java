@@ -4,6 +4,7 @@ import java.awt.Graphics;
 
 import ca.liqwidice.pong.Level;
 import ca.liqwidice.pong.Pong;
+import ca.liqwidice.pong.state.BasicState;
 
 public class GameState extends BasicState {
 

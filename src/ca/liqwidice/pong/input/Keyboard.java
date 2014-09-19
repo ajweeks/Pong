@@ -1,4 +1,4 @@
-package ca.liqwidice.pong;
+package ca.liqwidice.pong.input;
 
 import java.awt.Canvas;
 import java.awt.event.KeyEvent;
