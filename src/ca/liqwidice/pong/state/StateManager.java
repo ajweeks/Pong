@@ -6,9 +6,7 @@ import java.util.ArrayList;
 public class StateManager {
 
 	public static final int MAIN_MENU_STATE = 0;
-	public static final int GAME_STATE_EASY = 1;
-	public static final int GAME_STATE_MED = 2;
-	public static final int GAME_STATE_HARD = 3;
+	public static final int GAME_STATE = 1;
 
 	private ArrayList<BasicState> states = new ArrayList<>();
 	private BasicState currentState;

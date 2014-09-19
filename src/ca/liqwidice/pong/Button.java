@@ -25,6 +25,7 @@ public class Button {
 	}
 
 	public void update() {
+		if (!visible) return;
 		if (Pong.mouse.getX() > x && Pong.mouse.getX() < x + width && Pong.mouse.getY() > y
 				&& Pong.mouse.getY() < y + height) {
 			hover = true;

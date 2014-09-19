@@ -16,18 +16,17 @@ public class AIPaddle extends Paddle {
 		int difference = Math.abs(ballMid - playerMid);
 
 		if (ballMid > playerMid) { //ball is below paddle
-			if (level.getAiPaddleSpeed() < difference) {
-				y += level.getAiPaddleSpeed();
+			if (Level.AI_PADDLE_SPEED < difference) {
+				y += Level.AI_PADDLE_SPEED;
 			} else {
 				y += difference;
 			}
 		} else if (ballMid < playerMid) {
-			if (level.getAiPaddleSpeed() < difference) {
-				y -= level.getAiPaddleSpeed();
+			if (Level.AI_PADDLE_SPEED < difference) {
+				y -= Level.AI_PADDLE_SPEED;
 			} else {
 				y -= difference;
 			}
-			//y = (int) Math.min(y - level.getAiPaddleSpeed(), (y + height / 2) - (ball.y + ball.height / 2));
 		}
 
 		clamp();

@@ -45,9 +45,7 @@ public class Pong extends Canvas implements Runnable {
 
 		sm = new StateManager();
 		sm.addState(new MainMenuState(this));
-		sm.addState(new GameState(Level.EASY));
-		sm.addState(new GameState(Level.MED));
-		sm.addState(new GameState(Level.HARD));
+		sm.addState(new GameState(this));
 
 		requestFocus();
 	}
@@ -61,8 +59,6 @@ public class Pong extends Canvas implements Runnable {
 	}
 
 	private void render(Graphics g) {
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, SIZE.width, SIZE.height);
 		sm.render(g);
 	}
 

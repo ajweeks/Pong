@@ -6,30 +6,19 @@ import java.awt.Rectangle;
 
 public class Level {
 
-	public static final float EASY = 1.0f;
-	public static final float MED = 1.5f;
-	public static final float HARD = 2.0f;
-
-	private static final float BALL_XV = 9.0f;
-	private static final float PLAYER_PADDLE_SPEED = 8.0f;
-	private static final float AI_PADDLE_SPEED = 4.0f;
+	public static final float BALL_XV = 9.0f;
+	public static final float PLAYER_PADDLE_SPEED = 8.0f;
+	public static final float AI_PADDLE_SPEED = 4.0f;
 
 	private Ball ball;
 	private PlayerPaddle player;
 	private AIPaddle ai;
 	private boolean paused = false;
 	private int playerScore = 0, aiScore = 0;
-	private float playerPaddleSpeed;
-	private float aiPaddleSpeed;
-	private float ballXv;
 
-	public Level(float difficulty) {
-		playerPaddleSpeed = difficulty * PLAYER_PADDLE_SPEED;
-		aiPaddleSpeed = difficulty * AI_PADDLE_SPEED;
-		ballXv = difficulty * BALL_XV;
-
-		ball = Ball.newBall(this, false, ballXv);
-		player = new PlayerPaddle(this, 50, Pong.SIZE.height / 2 - 50, 25, 100);
+	public Level() {
+		ball = Ball.newBall(this, false);
+		player = new PlayerPaddle(50, Pong.SIZE.height / 2 - 50, 25, 100);
 		ai = new AIPaddle(this, Pong.SIZE.width - 75, Pong.SIZE.height / 2 - 50, 25, 100);
 	}
 
@@ -66,11 +55,11 @@ public class Level {
 		if (ball.x - ball.width < 0) {
 			aiScore++;
 			Sound.lose.play();
-			ball = Ball.newBall(this, false, ballXv);
+			ball = Ball.newBall(this, false);
 		} else if (ball.x > Pong.SIZE.width) {
 			playerScore++;
 			Sound.win.play();
-			ball = Ball.newBall(this, true, ballXv);
+			ball = Ball.newBall(this, true);
 		} else {
 			System.out.println("no one scored!!");
 			return;
@@ -78,6 +67,9 @@ public class Level {
 	}
 
 	public void render(Graphics g) {
+		g.setColor(Colour.offBlack);
+		g.fillRect(0, 0, Pong.SIZE.width, Pong.SIZE.height);
+
 		ball.render(g);
 		player.render(g);
 		ai.render(g);
@@ -97,14 +89,6 @@ public class Level {
 			g.setColor(Color.WHITE);
 			g.drawString("PAUSED", (Pong.SIZE.width / 2) - (g.getFontMetrics().stringWidth("PAUSED") / 2), 200);
 		}
-	}
-
-	public float getPlayerPaddleSpeed() {
-		return playerPaddleSpeed;
-	}
-
-	public float getAiPaddleSpeed() {
-		return aiPaddleSpeed;
 	}
 
 	public boolean isPaused() {

@@ -48,9 +48,9 @@ public class Ball extends Rectangle {
 	}
 
 	/** @return a ball at x, y with a randomized xv and yv */
-	public static Ball newBall(Level level, boolean towardsPlayer, float ballXv) {
-		double yv = (Math.random() * (ballXv - ballXv / 2));
-		double xv = ballXv;
+	public static Ball newBall(Level level, boolean towardsPlayer) {
+		double yv = (Math.random() * (Level.BALL_XV - Level.BALL_XV / 2));
+		double xv = Level.BALL_XV;
 		if (towardsPlayer) xv = -xv;
 		return new Ball(345, 225, xv, yv, 20);
 	}
