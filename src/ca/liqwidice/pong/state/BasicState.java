@@ -8,4 +8,5 @@ public abstract class BasicState {
 
 	public abstract void render(Graphics g);
 
+	public abstract int getID();
 }

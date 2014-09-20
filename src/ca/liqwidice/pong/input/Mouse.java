@@ -16,6 +16,11 @@ public class Mouse implements MouseMotionListener, MouseListener {
 		canvas.addMouseMotionListener(this);
 	}
 
+	public void releaseAll() {
+		leftDown = false;
+		rightDown = false;
+	}
+
 	public void mousePressed(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1) leftDown = true;
 		if (e.getButton() == MouseEvent.BUTTON3) rightDown = true;

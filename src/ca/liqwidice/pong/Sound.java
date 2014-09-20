@@ -36,14 +36,14 @@ public class Sound {
 	}
 
 	public static void increaseVolume() {
-		if (volume++ > 6.0) volume = 6.0f;
+		if (++volume > 6.0) volume = 6.0f;
 	}
 
 	public static void decreaseVolume() {
-		if (volume-- < 0) volume = 0;
+		if (--volume < 0) volume = 0;
 	}
 
-	public float getVolume() {
+	public static float getVolume() {
 		return volume;
 	}
 

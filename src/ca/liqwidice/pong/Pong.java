@@ -13,6 +13,7 @@ import ca.liqwidice.pong.input.Keyboard;
 import ca.liqwidice.pong.input.Mouse;
 import ca.liqwidice.pong.state.GameState;
 import ca.liqwidice.pong.state.MainMenuState;
+import ca.liqwidice.pong.state.ServerBrowserState;
 import ca.liqwidice.pong.state.StateManager;
 
 public class Pong extends Canvas implements Runnable {
@@ -22,10 +23,12 @@ public class Pong extends Canvas implements Runnable {
 	public static Keyboard keyboard;
 	public static Mouse mouse;
 	public static Font font32 = new Font("Consolas", Font.BOLD, 32);
+	public static Font font16 = font32.deriveFont(16.0f);
 
 	private JFrame frame;
 	private StateManager sm;
 
+	private boolean hasFocus = false;
 	private boolean running = false;
 
 	public Pong() {
@@ -46,6 +49,7 @@ public class Pong extends Canvas implements Runnable {
 		sm = new StateManager();
 		sm.addState(new MainMenuState(this));
 		sm.addState(new GameState(this));
+		sm.addState(new ServerBrowserState(this));
 
 		requestFocus();
 	}
@@ -55,10 +59,14 @@ public class Pong extends Canvas implements Runnable {
 	}
 
 	private void update() {
+		hasFocus = this.hasFocus();
 		sm.update();
 	}
 
 	private void render(Graphics g) {
+		g.setColor(Colour.offBlack);
+		g.fillRect(0, 0, Pong.SIZE.width, Pong.SIZE.height);
+
 		sm.render(g);
 	}
 
@@ -111,6 +119,10 @@ public class Pong extends Canvas implements Runnable {
 
 	public StateManager getStateManager() {
 		return sm;
+	}
+
+	public boolean hasFocus() {
+		return hasFocus;
 	}
 
 	public void stop() {

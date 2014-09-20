@@ -3,11 +3,15 @@ package ca.liqwidice.pong;
 public class AIPaddle extends Paddle {
 	private static final long serialVersionUID = 1L;
 
-	Level level;
+	public static final float EASY_SPEED = 4.0f;
+	public static final float MEDIUM_SPEED = 4.8f;
+	public static final float HARD_SPEED = 5.6f;
 
-	public AIPaddle(Level level, int x, int y, int width, int height) {
+	private float speed;
+
+	public AIPaddle(int x, int y, int width, int height, float speed) {
 		super(x, y, width, height);
-		this.level = level;
+		this.speed = speed;
 	}
 
 	public void update(Ball ball) {
@@ -16,17 +20,9 @@ public class AIPaddle extends Paddle {
 		int difference = Math.abs(ballMid - playerMid);
 
 		if (ballMid > playerMid) { //ball is below paddle
-			if (Level.AI_PADDLE_SPEED < difference) {
-				y += Level.AI_PADDLE_SPEED;
-			} else {
-				y += difference;
-			}
+			y += (int) Math.min(speed, difference);
 		} else if (ballMid < playerMid) {
-			if (Level.AI_PADDLE_SPEED < difference) {
-				y -= Level.AI_PADDLE_SPEED;
-			} else {
-				y -= difference;
-			}
+			y -= Math.min(speed, difference);
 		}
 
 		clamp();

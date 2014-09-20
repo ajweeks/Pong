@@ -41,8 +41,8 @@ public class Button {
 
 	public void render(Graphics g) {
 		if (!visible) return;
-		if (hover) g.setColor(col);
-		else g.setColor(hovcol);
+		if (hover) g.setColor(hovcol);
+		else g.setColor(col);
 		g.fillRect(x, y, width, height);
 
 		g.setColor(Color.WHITE);

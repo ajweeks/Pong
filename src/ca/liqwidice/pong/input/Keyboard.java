@@ -45,6 +45,13 @@ public class Keyboard implements KeyListener {
 		canvas.addKeyListener(this);
 	}
 
+	public void releaseAll() {
+		for (int i = 0; i < keys.size(); i++) {
+			keys.get(i).clicked = false;
+			keys.get(i).down = false;
+		}
+	}
+
 	private void keyUpdated(KeyEvent e, boolean pressed) {
 		Mouse.setMouseStill(true);
 

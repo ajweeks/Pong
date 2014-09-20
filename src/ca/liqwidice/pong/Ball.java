@@ -49,10 +49,10 @@ public class Ball extends Rectangle {
 
 	/** @return a ball at x, y with a randomized xv and yv */
 	public static Ball newBall(Level level, boolean towardsPlayer) {
-		double yv = (Math.random() * (Level.BALL_XV - Level.BALL_XV / 2));
+		double yv = (Math.random() * Level.BALL_XV) - Level.BALL_XV / 2;
 		double xv = Level.BALL_XV;
 		if (towardsPlayer) xv = -xv;
-		return new Ball(345, 225, xv, yv, 20);
+		return new Ball(348, 225, xv, yv, 20);
 	}
 
 	public boolean isOffScreen() {

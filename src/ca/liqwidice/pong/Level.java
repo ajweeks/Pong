@@ -2,13 +2,11 @@ package ca.liqwidice.pong;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 public class Level {
 
 	public static final float BALL_XV = 9.0f;
 	public static final float PLAYER_PADDLE_SPEED = 8.0f;
-	public static final float AI_PADDLE_SPEED = 4.0f;
 
 	private Ball ball;
 	private PlayerPaddle player;
@@ -19,7 +17,7 @@ public class Level {
 	public Level() {
 		ball = Ball.newBall(this, false);
 		player = new PlayerPaddle(50, Pong.SIZE.height / 2 - 50, 25, 100);
-		ai = new AIPaddle(this, Pong.SIZE.width - 75, Pong.SIZE.height / 2 - 50, 25, 100);
+		ai = new AIPaddle(Pong.SIZE.width - 75, Pong.SIZE.height / 2 - 50, 25, 100, AIPaddle.EASY_SPEED);
 	}
 
 	public void update() {
@@ -33,22 +31,25 @@ public class Level {
 			resetGame();
 		}
 
-		collide(player);
-		collide(ai);
-	}
-
-	private void collide(Rectangle r) {
-		if (ball.x < r.x + r.width - BALL_XV) { //ball is hitting top or bottom of paddle
-			if (ball.y + ball.height / 2 > r.y + r.height / 2) ball.y -= BALL_XV;
-			else ball.y += BALL_XV + 1;
-			ball.setYv(-ball.getYv());
-			return;
+		//PLAYER
+		if (ball.x < player.x + player.width && (ball.y + ball.height > player.y && ball.y < player.y + player.height)) { //ball is hitting top or bottom of paddle
+			float halfHeight = player.height / 2;
+			float angle = ((player.y + (player.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
+			ball.x = player.x + player.width;
+			ball.setXv(-ball.getXv());
+			ball.setYv(-angle * Level.BALL_XV);
+			Sound.boop.play();
 		}
-		double angle = ((r.y + (r.height / 2)) - (ball.y + (ball.height / 2))) / 7;
-		ball.x = r.x + r.width;
-		ball.setXv(-ball.getXv());
-		ball.setYv(-angle);
-		Sound.boop.play();
+
+		//AI
+		if (ball.x + ball.width > ai.x && (ball.y + ball.height > ai.y && ball.y < ai.y + ai.height)) { //ball is hitting top or bottom of paddle
+			float halfHeight = ai.height / 2;
+			float angle = ((ai.y + (ai.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
+			ball.x = ai.x - ball.width;
+			ball.setXv(-ball.getXv());
+			ball.setYv(-angle);
+			Sound.boop.play();
+		}
 	}
 
 	private void resetGame() {
@@ -67,9 +68,6 @@ public class Level {
 	}
 
 	public void render(Graphics g) {
-		g.setColor(Colour.offBlack);
-		g.fillRect(0, 0, Pong.SIZE.width, Pong.SIZE.height);
-
 		ball.render(g);
 		player.render(g);
 		ai.render(g);
