@@ -6,7 +6,7 @@ import ca.liqwidice.pong.Button;
 import ca.liqwidice.pong.ButtonManager;
 import ca.liqwidice.pong.Level;
 import ca.liqwidice.pong.Pong;
-import ca.liqwidice.pong.state.BasicState;
+import ca.liqwidice.pong.input.Keyboard.Key;
 
 /** Single player game state */
 public class GameState extends BasicState {
@@ -29,7 +29,7 @@ public class GameState extends BasicState {
 	}
 
 	public void update() {
-		if (Pong.keyboard.esc.clicked) level.setPaused(!level.isPaused());
+		if (Key.ESC.clicked) level.setPaused(!level.isPaused());
 
 		manager.updateAll();
 
@@ -47,7 +47,6 @@ public class GameState extends BasicState {
 		}
 
 		level.update();
-		Pong.keyboard.update();
 	}
 
 	public void render(Graphics g) {
@@ -58,7 +57,7 @@ public class GameState extends BasicState {
 	public void setPaused(boolean paused) {
 		level.setPaused(paused);
 	}
-	
+
 	public int getID() {
 		return StateManager.GAME_STATE;
 	}

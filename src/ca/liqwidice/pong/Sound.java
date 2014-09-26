@@ -11,6 +11,7 @@ public class Sound {
 
 	public static Sound boop = new Sound("res/sounds/boop.wav");
 	public static Sound boop2 = new Sound("res/sounds/boop2.wav");
+	public static Sound click = new Sound("res/sounds/click.wav");
 	public static Sound lose = new Sound("res/sounds/lose.wav");
 	public static Sound win = new Sound("res/sounds/win.wav");
 
@@ -23,12 +24,12 @@ public class Sound {
 	}
 
 	public synchronized void play() {
+		if (volume == 0) return;
 		try {
 			Clip clip = AudioSystem.getClip();
 			AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(path));
 			clip.open(inputStream);
-			FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-			gainControl.setValue(0.1f);
+			((FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN)).setValue(volume); //TODO actually implement volume control
 			clip.start();
 		} catch (Exception e) {
 			e.printStackTrace();

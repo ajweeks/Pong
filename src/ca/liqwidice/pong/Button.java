@@ -30,7 +30,10 @@ public class Button {
 				&& Pong.mouse.getY() < y + height) {
 			hover = true;
 			if (down) clicked = false;
-			else if (Pong.mouse.isLeftDown()) clicked = true;
+			else if (Pong.mouse.isLeftDown()) {
+				Sound.click.play();
+				clicked = true;
+			}
 			down = Pong.mouse.isLeftDown();
 			return;
 		} else hover = false;

@@ -5,8 +5,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferStrategy;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import ca.liqwidice.pong.input.Keyboard;
@@ -27,6 +29,7 @@ public class Pong extends Canvas implements Runnable {
 
 	private JFrame frame;
 	private StateManager sm;
+	private Image icon = new ImageIcon("res/icon.png").getImage();
 
 	private boolean hasFocus = false;
 	private boolean running = false;
@@ -42,6 +45,7 @@ public class Pong extends Canvas implements Runnable {
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		frame.setIconImage(icon);
 
 		keyboard = new Keyboard(this);
 		mouse = new Mouse(this);
@@ -61,6 +65,7 @@ public class Pong extends Canvas implements Runnable {
 	private void update() {
 		hasFocus = this.hasFocus();
 		sm.update();
+		keyboard.update(); //set's all clicked values to false!
 	}
 
 	private void render(Graphics g) {

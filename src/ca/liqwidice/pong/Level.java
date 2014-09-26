@@ -17,7 +17,7 @@ public class Level {
 	public Level() {
 		ball = Ball.newBall(this, false);
 		player = new PlayerPaddle(50, Pong.SIZE.height / 2 - 50, 25, 100);
-		ai = new AIPaddle(Pong.SIZE.width - 75, Pong.SIZE.height / 2 - 50, 25, 100, AIPaddle.EASY_SPEED);
+		ai = new AIPaddle(Pong.SIZE.width - 75, Pong.SIZE.height / 2 - 50, 25, 100, AIPaddle.HARD_SPEED); //TODO add level difficulty selection
 	}
 
 	public void update() {
@@ -33,6 +33,7 @@ public class Level {
 
 		//PLAYER
 		if (ball.x < player.x + player.width && (ball.y + ball.height > player.y && ball.y < player.y + player.height)) { //ball is hitting top or bottom of paddle
+			if (ball.x < player.x) return;
 			float halfHeight = player.height / 2;
 			float angle = ((player.y + (player.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
 			ball.x = player.x + player.width;
@@ -43,6 +44,7 @@ public class Level {
 
 		//AI
 		if (ball.x + ball.width > ai.x && (ball.y + ball.height > ai.y && ball.y < ai.y + ai.height)) { //ball is hitting top or bottom of paddle
+			if (ball.x > ai.x + ai.width) return;
 			float halfHeight = ai.height / 2;
 			float angle = ((ai.y + (ai.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
 			ball.x = ai.x - ball.width;

@@ -4,8 +4,8 @@ public class AIPaddle extends Paddle {
 	private static final long serialVersionUID = 1L;
 
 	public static final float EASY_SPEED = 4.0f;
-	public static final float MEDIUM_SPEED = 4.8f;
-	public static final float HARD_SPEED = 5.6f;
+	public static final float MEDIUM_SPEED = 5.0f;
+	public static final float HARD_SPEED = 6.2f;
 
 	private float speed;
 
