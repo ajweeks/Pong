@@ -20,16 +20,19 @@ public class Keyboard implements KeyListener {
 		//other
 		SPACE(" ", false), SLASH("/", "?", false), BACKSLASH("\\", "|", false), COMMA(",", "<", false), PERIOD(".",
 				">", false), GRAVE("`", "~", false), LSQUARE("[", "{", false), RSQUARE("]", "}", false), SEMICOLON(";",
-				":", false), APOSTROPHE("\'", "\"", false), MINUS("-", "_", false), EQUALS("=", "+", false), TAB("    ",
-				false),
+				":", false), APOSTROPHE("\'", "\"", false), MINUS("-", "_", false), EQUALS("=", "+", false), TAB(
+				"    ", false),
 
 		//function keys
 		UP("up", true), DOWN("down", true), LEFT("left", true), RIGHT("right", true), ESC("esc", true), BACKSPACE(
 				"bksp", true), DEL("del", true), SHIFT("shift", true), CONTROL("control", true);
 
 		public final String text, TEXT;
-		public boolean clicked, down, isFunctionKey;
+		public boolean clicked, isFunctionKey;
+		public int down = -1;
 
+		/** @param text - the string to be printed when this key is down
+		 * 	@param TEXT - the string to be printed when shift is being held as well as this key  */
 		Key(String text, String TEXT, boolean isFunctionKey) {
 			this.text = text;
 			this.TEXT = TEXT;
@@ -42,12 +45,15 @@ public class Keyboard implements KeyListener {
 
 		public void update() {
 			if (clicked) clicked = false;
+			if (down != -1) down++;
 		}
 
 		public void changed(boolean pressed) {
-			if (!down && pressed) clicked = true;
+			if (down == -1 && pressed) clicked = true; //mouse wasn't down last frame but is down this frame
 			else clicked = false;
-			down = pressed;
+
+			if (pressed) down++;
+			else down = -1;
 		}
 	}
 
@@ -66,12 +72,12 @@ public class Keyboard implements KeyListener {
 		Key[] keys = Key.values();
 		for (int i = 0; i < keys.length; i++) {
 			keys[i].clicked = false;
-			keys[i].down = false;
+			keys[i].down = -1;
 		}
 	}
 
 	private void keyUpdated(KeyEvent ke, boolean pressed) {
-		Mouse.setMouseStill(true);
+		Mouse.setStill(true);
 
 		//function keys
 		switch (ke.getKeyCode()) {
@@ -92,6 +98,9 @@ public class Keyboard implements KeyListener {
 			break;
 		case KeyEvent.VK_SHIFT:
 			Key.SHIFT.changed(pressed);
+			break;
+		case KeyEvent.VK_CONTROL:
+			Key.CONTROL.changed(pressed);
 			break;
 		case KeyEvent.VK_BACK_SPACE:
 			Key.BACKSPACE.changed(pressed);

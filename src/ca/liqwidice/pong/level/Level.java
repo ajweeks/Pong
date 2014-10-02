@@ -1,18 +1,26 @@
-package ca.liqwidice.pong;
+package ca.liqwidice.pong.level;
 
 import java.awt.Color;
 import java.awt.Graphics;
 
+import ca.liqwidice.pong.Pong;
+import ca.liqwidice.pong.input.Keyboard.Key;
+import ca.liqwidice.pong.paddle.AIPaddle;
+import ca.liqwidice.pong.paddle.PlayerPaddle;
+import ca.liqwidice.pong.sound.Sound;
+
 public class Level {
 
 	public static final float BALL_XV = 9.0f;
-	public static final float PLAYER_PADDLE_SPEED = 8.0f;
+
+	public static final int WINNING_SCORE = 11;
 
 	private Ball ball;
 	private PlayerPaddle player;
 	private AIPaddle ai;
 	private boolean paused = false;
 	private int playerScore = 0, aiScore = 0;
+	private boolean gameOver = false;
 
 	public Level() {
 		ball = Ball.newBall(this, false);
@@ -23,12 +31,17 @@ public class Level {
 	public void update() {
 		if (paused) return;
 
+		if (playerScore >= WINNING_SCORE || aiScore >= WINNING_SCORE) {
+			gameOver = true;
+		}
+		if (gameOver) return;
+
 		player.update();
 		ball.update();
 		ai.update(ball);
 
 		if (ball.isOffScreen()) {
-			resetGame();
+			resetBall();
 		}
 
 		//PLAYER
@@ -54,7 +67,7 @@ public class Level {
 		}
 	}
 
-	private void resetGame() {
+	public void resetBall() {
 		if (ball.x - ball.width < 0) {
 			aiScore++;
 			Sound.lose.play();
@@ -69,7 +82,27 @@ public class Level {
 		}
 	}
 
+	public void resetGame() {
+		gameOver = false;
+		playerScore = 0;
+		aiScore = 0;
+	}
+
 	public void render(Graphics g) {
+		if (Key.ESC.clicked) {
+			resetGame();
+			return;
+		}
+		if (gameOver) {
+			g.setColor(Color.GREEN);
+			if (aiScore >= WINNING_SCORE) {
+				g.fillRect(Pong.SIZE.width / 2, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
+			}
+			if (playerScore >= WINNING_SCORE) {
+				g.fillRect(0, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
+			}
+		}
+
 		ball.render(g);
 		player.render(g);
 		ai.render(g);
@@ -80,7 +113,7 @@ public class Level {
 		g.drawString(aiScore + "", Pong.SIZE.width / 2 + 50, 24);
 
 		for (int i = 0; i < 8; i++) {
-			g.fillRect(Pong.SIZE.width / 2 - 6, i * 65 - 10, 12, 45);
+			g.fillRect(Pong.SIZE.width / 2 - 6, i * 65 - 10, 12, 45); //midfield lines
 		}
 
 		if (paused) {
@@ -89,6 +122,10 @@ public class Level {
 			g.setColor(Color.WHITE);
 			g.drawString("PAUSED", (Pong.SIZE.width / 2) - (g.getFontMetrics().stringWidth("PAUSED") / 2), 200);
 		}
+	}
+
+	public boolean isGameOver() {
+		return gameOver;
 	}
 
 	public boolean isPaused() {

@@ -2,10 +2,10 @@ package ca.liqwidice.pong.state;
 
 import java.awt.Graphics;
 
-import ca.liqwidice.pong.Button;
-import ca.liqwidice.pong.ButtonManager;
 import ca.liqwidice.pong.Pong;
 import ca.liqwidice.pong.TextBox;
+import ca.liqwidice.pong.button.ButtonManager;
+import ca.liqwidice.pong.button.ImageButton;
 import ca.liqwidice.pong.input.Keyboard.Key;
 
 public class ServerBrowserState extends BasicState {
@@ -20,7 +20,7 @@ public class ServerBrowserState extends BasicState {
 	public ServerBrowserState(Pong pong) {
 		this.pong = pong;
 		manager = new ButtonManager();
-		manager.addButton(new Button("Main Menu", 15, 15, 215, 120));
+		manager.addButton(new ImageButton("Main Menu", 15, 15, 215, 120));
 	}
 
 	public void update() {

@@ -1,4 +1,4 @@
-package ca.liqwidice.pong;
+package ca.liqwidice.pong.sound;
 
 import java.io.File;
 

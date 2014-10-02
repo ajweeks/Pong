@@ -1,8 +1,11 @@
-package ca.liqwidice.pong;
+package ca.liqwidice.pong.level;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+
+import ca.liqwidice.pong.Pong;
+import ca.liqwidice.pong.sound.Sound;
 
 public class Ball extends Rectangle {
 	private static final long serialVersionUID = 1L;

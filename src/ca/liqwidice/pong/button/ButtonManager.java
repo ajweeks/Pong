@@ -1,4 +1,4 @@
-package ca.liqwidice.pong;
+package ca.liqwidice.pong.button;
 
 import java.awt.Graphics;
 import java.util.ArrayList;

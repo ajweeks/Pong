@@ -1,13 +1,20 @@
-package ca.liqwidice.pong;
+package ca.liqwidice.pong.button;
 
 import java.awt.Color;
 import java.awt.Graphics;
 
+import ca.liqwidice.pong.Colour;
+import ca.liqwidice.pong.Pong;
+import ca.liqwidice.pong.sound.Sound;
+
 public class Button {
 
-	private String text;
-	private int x, y, width, height;
-	private boolean hover = false, clicked = false, down = false, visible = true;
+	protected String text;
+	protected int x, y, width, height;
+	protected boolean hover = false;
+	protected boolean clicked = false;
+	protected boolean down = false;
+	protected boolean visible = true;
 	private Color col, hovcol;
 
 	public Button(String text, int x, int y, int height, int width, Color col, Color hovcol) { //TODO add text rendering
@@ -62,14 +69,17 @@ public class Button {
 	}
 
 	public boolean isHovering() {
+		if (!visible) return false;
 		return hover;
 	}
 
 	public boolean isClicked() {
+		if (!visible) return false;
 		return clicked;
 	}
 
 	public boolean isDown() {
+		if (!visible) return false;
 		return down;
 	}
 

@@ -8,41 +8,68 @@ import java.awt.event.MouseMotionListener;
 public class Mouse implements MouseMotionListener, MouseListener {
 
 	private int x, y;
-	private boolean leftDown, rightDown;
-	private static boolean mouseStill = true;
+	private boolean leftDown, rightDown, leftClicked, rightClicked;
+	private static boolean still = true;
 
 	public Mouse(Canvas canvas) {
 		canvas.addMouseListener(this);
 		canvas.addMouseMotionListener(this);
 	}
 
+	public void update() {
+		leftClicked = false;
+		rightClicked = false;
+	}
+
 	public void releaseAll() {
 		leftDown = false;
 		rightDown = false;
+		leftClicked = false;
+		rightClicked = false;
 	}
 
 	public void mousePressed(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1) leftDown = true;
-		if (e.getButton() == MouseEvent.BUTTON3) rightDown = true;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			leftClicked = true;
+			leftDown = true;
+		}
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			rightClicked = false;
+			rightDown = true;
+		}
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1) leftDown = false;
-		if (e.getButton() == MouseEvent.BUTTON3) rightDown = false;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			leftClicked = false;
+			leftDown = false;
+		}
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			rightClicked = false;
+			rightDown = false;
+		}
 	}
 
 	public void mouseMoved(MouseEvent e) {
-		mouseStill = false;
+		still = false;
 		x = e.getX();
 		y = e.getY();
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		mouseStill = false;
+		still = false;
 		x = e.getX();
 		y = e.getY();
-		if (e.getButton() == MouseEvent.BUTTON1) leftDown = false;
-		if (e.getButton() == MouseEvent.BUTTON3) rightDown = false;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			if (!leftDown) leftClicked = true;
+			else leftClicked = false;
+			leftDown = false;
+		}
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			if (!rightDown) rightClicked = true;
+			else rightClicked = false;
+			rightDown = false;
+		}
 	}
 
 	public int getX() {
@@ -53,6 +80,14 @@ public class Mouse implements MouseMotionListener, MouseListener {
 		return y;
 	}
 
+	public boolean isLeftClicked() {
+		return leftClicked;
+	}
+
+	public boolean isRightClicked() {
+		return rightClicked;
+	}
+
 	public boolean isLeftDown() {
 		return leftDown;
 	}
@@ -61,12 +96,12 @@ public class Mouse implements MouseMotionListener, MouseListener {
 		return rightDown;
 	}
 
-	public static void setMouseStill(boolean mouseStill) {
-		Mouse.mouseStill = mouseStill;
+	public static void setStill(boolean still) {
+		Mouse.still = still;
 	}
 
-	public static boolean isMouseStill() {
-		return Mouse.mouseStill;
+	public static boolean isStill() {
+		return Mouse.still;
 	}
 
 	public void mouseEntered(MouseEvent e) {}

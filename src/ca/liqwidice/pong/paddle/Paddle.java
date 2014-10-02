@@ -1,8 +1,10 @@
-package ca.liqwidice.pong;
+package ca.liqwidice.pong.paddle;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+
+import ca.liqwidice.pong.Pong;
 
 public class Paddle extends Rectangle {
 	private static final long serialVersionUID = 1L;

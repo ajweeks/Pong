@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import ca.liqwidice.pong.input.Keyboard;
+import ca.liqwidice.pong.input.Keyboard.Key;
 import ca.liqwidice.pong.input.Mouse;
 import ca.liqwidice.pong.state.GameState;
 import ca.liqwidice.pong.state.MainMenuState;
@@ -63,9 +64,13 @@ public class Pong extends Canvas implements Runnable {
 	}
 
 	private void update() {
+		if (Key.W.clicked && Key.CONTROL.down > -1) {
+			stop();
+		}
 		hasFocus = this.hasFocus();
 		sm.update();
 		keyboard.update(); //set's all clicked values to false!
+		mouse.update();
 	}
 
 	private void render(Graphics g) {

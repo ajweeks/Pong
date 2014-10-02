@@ -1,4 +1,6 @@
-package ca.liqwidice.pong;
+package ca.liqwidice.pong.paddle;
+
+import ca.liqwidice.pong.level.Ball;
 
 public class AIPaddle extends Paddle {
 	private static final long serialVersionUID = 1L;

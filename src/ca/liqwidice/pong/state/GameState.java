@@ -2,17 +2,18 @@ package ca.liqwidice.pong.state;
 
 import java.awt.Graphics;
 
-import ca.liqwidice.pong.Button;
-import ca.liqwidice.pong.ButtonManager;
-import ca.liqwidice.pong.Level;
 import ca.liqwidice.pong.Pong;
+import ca.liqwidice.pong.button.ButtonManager;
+import ca.liqwidice.pong.button.ImageButton;
 import ca.liqwidice.pong.input.Keyboard.Key;
+import ca.liqwidice.pong.level.Level;
 
 /** Single player game state */
 public class GameState extends BasicState {
 
 	private static final int RESUME = 0;
 	private static final int MAIN_MENU = 1;
+	private static final int NEW_GAME = 2;
 
 	private Level level;
 	private ButtonManager manager;
@@ -23,8 +24,10 @@ public class GameState extends BasicState {
 		level = new Level();
 		manager = new ButtonManager();
 
-		manager.addButton(new Button("Resume", Pong.SIZE.width / 2 - 175 / 2, 135, 175, 80));
-		manager.addButton(new Button("Main Menu", Pong.SIZE.width / 2 - 175 / 2, 220, 175, 80));
+		manager.addButton(new ImageButton("Resume", Pong.SIZE.width / 2 - 175 / 2, 135, 175, 80));
+		manager.addButton(new ImageButton("Main Menu", Pong.SIZE.width / 2 - 175 / 2, 220, 175, 80));
+
+		manager.addButton(new ImageButton("New Game", Pong.SIZE.width / 2 - 175 / 2, 305, 175, 80));
 		//TODO ADD DIFFICULTY SWITCHING!
 	}
 
@@ -33,17 +36,31 @@ public class GameState extends BasicState {
 
 		manager.updateAll();
 
-		if (level.isPaused()) {
-			manager.getButton(MAIN_MENU).setVisible(true);
-			manager.getButton(RESUME).setVisible(true);
-			if (manager.getButton(MAIN_MENU).isClicked()) {
+		if (level.isGameOver()) {
+			if (Key.ESC.clicked) {
+				level.resetGame();
 				pong.getStateManager().enterState(StateManager.MAIN_MENU_STATE);
-			} else if (manager.getButton(RESUME).isClicked()) {
-				level.setPaused(false);
 			}
+			manager.getButton(NEW_GAME).setVisible(true);
+			manager.getButton(MAIN_MENU).setVisible(true);
 		} else {
-			manager.getButton(MAIN_MENU).setVisible(false);
-			manager.getButton(RESUME).setVisible(false);
+			manager.getButton(NEW_GAME).setVisible(false);
+
+			if (level.isPaused()) {
+				manager.getButton(MAIN_MENU).setVisible(true);
+				manager.getButton(RESUME).setVisible(true);
+			} else {
+				manager.getButton(MAIN_MENU).setVisible(false);
+				manager.getButton(RESUME).setVisible(false);
+			}
+		}
+
+		if (manager.getButton(MAIN_MENU).isClicked()) {
+			pong.getStateManager().enterState(StateManager.MAIN_MENU_STATE);
+		} else if (manager.getButton(RESUME).isClicked()) {
+			level.setPaused(false);
+		} else if (manager.getButton(NEW_GAME).isClicked()) {
+			level.resetGame();
 		}
 
 		level.update();
@@ -61,5 +78,4 @@ public class GameState extends BasicState {
 	public int getID() {
 		return StateManager.GAME_STATE;
 	}
-
 }
