@@ -13,20 +13,23 @@ public class TextBox {
 
 	private int x, y, width, height;
 	private Font font;
-	private Color backgroundColor, fontColor;
+	private Color backgroundColor, fontColor, selectionColour;
 	private boolean hasFocus = false;
 	private String text = "";
 	private String clipboard = "";
 
 	private int delay = 0; //how many ticks to wait after a key has been held down before printing that key repeatedly
-	private int blinkRate; //The number of updates to wait before turning cursor on/off
+	private int blinkRate; //The number of ticks to wait before turning cursor on/off
 	private boolean cursorOn = true; //Whether or not the cursor is being shown this frame (used for blinking effect)
-	private int cursorStart = 0; //The number of chars to the left of the cursor (EX: wor|ds, cursorPos=3)
-	private int cursorEnd = 0; //The number of chars to the left of the current selected text
+	private int cursorStart = 0; //The number of chars to the left of the start of the selected text(EX: wor|ds, cursorPos=3)
+	private int cursorEnd = 0; //The number of chars to the left of the end of the selected text
 	private int ticks = 0;
+	private boolean full = false; //is true once no more characters can fit in
+
+	//TODO add insert mode?
 
 	public TextBox(int x, int y, int width, int height, Font font, Color backgroundColor, Color fontColor,
-			int blinkRate, int delay) {
+			Color selectionColour, int blinkRate, int delay) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -36,10 +39,12 @@ public class TextBox {
 		this.fontColor = fontColor;
 		this.blinkRate = blinkRate;
 		this.delay = delay;
+		this.selectionColour = selectionColour;
 	}
 
 	public TextBox(int x, int y, int width, int height) {
-		this(x, y, width, height, Pong.font16, Color.WHITE, Color.BLACK, DEFAULT_BLINK_RATE, DEFAULT_DELAY);
+		this(x, y, width, height, Pong.font16, Color.WHITE, Color.BLACK, Colour.SELECTED_TEXT, DEFAULT_BLINK_RATE,
+				DEFAULT_DELAY);
 	}
 
 	public void update() {
@@ -76,27 +81,51 @@ public class TextBox {
 			}
 		}
 
-		if (Key.RIGHT.clicked) {
-			if (Key.SHIFT.down > -1) {
-				cursorEnd++; //expand current selection
-			} else {
-				cursorStart++; //move cursor to the right
-				cursorEnd = cursorStart;
-			}
-		} else if (Key.LEFT.clicked) {
-			if (Key.SHIFT.down > -1) { //expand current selection
-				cursorStart--;
-			} else {
-				cursorStart--; //move cursor to the left
-				cursorEnd = cursorStart;
-			}
+		if (Key.RIGHT.clicked || Key.RIGHT.down > delay) {
+			if (Key.CONTROL.down > -1) {
+				if (Key.SHIFT.down > -1) { //if shift is down, leave the cursorStart where it is
+					cursorEnd = text.length();
+				} else {
+					cursorEnd = text.length();
+					cursorStart = cursorEnd;
+				}
+			} else moveCursorLeft();
+		} else if (Key.LEFT.clicked || Key.LEFT.down > delay) {
+			if (Key.CONTROL.down > -1) {
+				if (Key.SHIFT.down > -1) { //if shift is down, leave the cursorEnd where it is
+					cursorStart = 0;
+				} else {
+					cursorStart = 0;
+					cursorEnd = cursorStart;
+				}
+			} else moveCursorRight();
 		}
 		cursorClamp();
 
+		if (Key.HOME.clicked) {
+			if (Key.SHIFT.down > -1) {
+				cursorStart = 0;
+			} else {
+				cursorStart = 0;
+				cursorEnd = cursorStart;
+			}
+		} else if (Key.END.clicked) {
+			if (Key.SHIFT.down > -1) {
+				cursorEnd = text.length();
+			} else {
+				cursorStart = text.length();
+				cursorEnd = cursorStart;
+			}
+		}
+
 		if (Key.CONTROL.down != -1) {
 			if (Key.A.clicked) {
-				cursorStart = 0;
-				cursorEnd = text.length();
+				if (cursorStart == 0 && cursorEnd == text.length()) {
+					cursorStart = text.length();
+				} else {
+					cursorStart = 0;
+					cursorEnd = text.length();
+				}
 			}
 
 			if (Key.C.clicked) {
@@ -117,71 +146,121 @@ public class TextBox {
 		if (Key.DEL.clicked) del();
 	}
 
-	public void render(Graphics g) {
-		g.setColor(backgroundColor);
-		g.fillRect(x, y, width, height);
-
-		while (g.getFontMetrics().stringWidth(text) > width) {
-			text = text.substring(0, text.length());
-		}
-		cursorClamp();
-
-		if (hasFocus) {
-			g.setColor(Color.GRAY);
-			g.drawRect(x + 1, y + 1, width - 3, height - 3);
-		}
-
-		g.setColor(fontColor);
-		g.setFont(font);
-
-		if (hasFocus) {
-			if (cursorStart == cursorEnd) {
-				if (cursorOn) {
-					g.drawString(text.substring(0, cursorStart) + "|" + text.substring(cursorEnd), x + 2, y + 15);
-				} else {
-					g.drawString(text.substring(0, cursorStart) + " " + text.substring(cursorEnd), x + 2, y + 15);
-				}
-			} else {
-				String beginning = text.substring(0, cursorStart);
-				String middle = text.substring(cursorStart, cursorEnd);
-				String end = text.substring(cursorEnd);
-				if (beginning.length() > 0) {
-					g.drawString(beginning, x + 2, y + 15);
-				}
-
-				g.setColor(Color.GREEN);
-				g.drawString(middle, x + 2, y + 15);
-
-				if (end.length() > 0) {
-					g.setColor(fontColor);
-					g.drawString(end, x + 2, y + 15);
-				}
-			}
+	private void moveCursorLeft() {
+		if (Key.SHIFT.down > -1) {
+			cursorEnd++; //expand current selection
+		} else {
+			cursorStart++; //move cursor to the right
+			cursorEnd = cursorStart;
 		}
 	}
 
+	private void moveCursorRight() {
+		if (Key.SHIFT.down > -1) { //expand current selection
+			cursorStart--;
+		} else {
+			cursorStart--; //move cursor to the left
+			cursorEnd = cursorStart;
+		}
+	}
+
+	public void render(Graphics g) {
+		g.setFont(font);
+		if (hasFocus) {
+			g.setColor(Color.BLUE);
+			g.fillRect(x - 2, y - 2, width + 4, height + 4);
+		}
+
+		g.setColor(backgroundColor);
+		g.fillRect(x, y, width, height);
+
+		if (g.getFontMetrics().stringWidth(text + g.getFontMetrics().getMaxAdvance() * 2) > width) {
+			full = true;
+		} else full = false;
+
+		if (cursorStart == cursorEnd) {
+			g.setColor(fontColor);
+			if (cursorOn && hasFocus) {
+				g.drawString(text.substring(0, cursorStart) + "|" + text.substring(cursorEnd), x + 2, y + 16);
+			} else {
+				g.drawString(text.substring(0, cursorStart) + " " + text.substring(cursorEnd), x + 2, y + 16);
+			}
+		} else { //something is selected
+			String beginning = text.substring(0, cursorStart);
+			String middle = text.substring(cursorStart, cursorEnd); //selected text
+			String end = text.substring(cursorEnd);
+			int xo = 0;
+
+			if (beginning.length() > 0) {
+				g.setColor(fontColor);
+				g.drawString(beginning, x + 2, y + 16);
+			}
+
+			xo += g.getFontMetrics().stringWidth(beginning);
+
+			//selected text
+			if (cursorStart != cursorEnd) {
+				g.setColor(selectionColour);
+				g.fillRect(x + cursorStart, y + cursorEnd + 2, cursorEnd - cursorStart, height - 4);
+			}
+
+			g.setColor(Color.GREEN);
+			g.drawString(middle, x + xo + 2, y + 16);
+
+			xo += g.getFontMetrics().stringWidth(middle);
+
+			g.setColor(fontColor);
+			g.drawString(cursorOn ? "|" : " ", x + xo + 2, y + 16);
+
+			xo += g.getFontMetrics().stringWidth(cursorOn ? "|" : " ");
+
+			if (end.length() > 0) {
+				g.setColor(fontColor);
+				g.drawString(end, x + xo + 2, y + 16);
+			}
+		}
+
+	}
+
+	/** Deletes one character behind the cursor if nothing is selected.
+	 *  If something is selected, it is deleted */
 	public void backspace() {
-		if (text.length() == 0) return;
-		if (cursorStart == 0 && cursorEnd == text.length()) {
-			text = "";
-			cursorEnd = 0;
+		if (text.length() == 0) return; //nothing to delete
+		if (cursorStart == 0 && cursorEnd == text.length()) { //everything is selected
+			clear();
 			return;
 		}
-		//TODO check if cS == cE
-		text = text.substring(0, cursorStart - 1) + text.substring(cursorEnd);
-		cursorStart--;
+		if (cursorStart == 0) {
+			if (cursorEnd == cursorStart) return;
+			text = text.substring(0, cursorEnd);
+			cursorClamp();
+			return;
+		}
+		if (cursorStart == cursorEnd) {
+			text = text.substring(0, cursorStart - 1) + text.substring(cursorEnd);
+			cursorStart--;
+		} else {
+			text = text.substring(0, cursorStart) + text.substring(cursorEnd);
+		}
 		cursorEnd = cursorStart;
 		cursorClamp();
 	}
 
+	/** Deletes one character in front of the cursor if nothing is selected.
+	 *  If something is selected, it is deleted */
 	public void del() {
-		if (text.length() == 0) return;
-		if (cursorStart == 0 && cursorEnd == text.length()) {
-			text = "";
-			cursorEnd = 0;
+		if (text.length() == 0) return; //nothing to delete
+		if (cursorStart == 0 && cursorEnd == text.length()) { //everything is selected
+			clear();
 			return;
 		}
-		//TODO check if cS == cE
+		if (cursorEnd == text.length()) {
+			if (cursorStart == cursorEnd) return;
+			text = text.substring(0, cursorStart);
+			cursorClamp();
+			return;
+
+		}
 		if (cursorStart != cursorEnd) {
 			backspace();
 			return;
@@ -191,18 +270,18 @@ public class TextBox {
 	}
 
 	public void addString(String s) {
-		if (cursorStart != cursorEnd) {
-			backspace();
-			cursorEnd = cursorStart;
-		}
-		int a = text.substring(0, cursorStart).length() + 1;
+		if (cursorStart != cursorEnd) { //some text is selected
+			backspace(); //delete it
+			cursorEnd = cursorStart; //reset cursor pos
+		} else if (full) return;
 		text = text.substring(0, cursorStart) + s + text.substring(cursorEnd);
-		cursorStart = a;
+		cursorStart++;
 		cursorEnd = cursorStart;
 		cursorClamp();
 	}
 
 	private void cursorClamp() {
+		//TODO implement selection direction!!
 		if (text.length() == 0) {
 			cursorStart = 0;
 			cursorEnd = 0;

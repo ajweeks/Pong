@@ -17,7 +17,7 @@ public class Keyboard implements KeyListener {
 				false), NUM5("5", "%", false), NUM6("6", "^", false), NUM7("7", "&", false), NUM8("8", "*", false), NUM9(
 				"9", "(", false),
 
-		//other
+		//other non-function keys
 		SPACE(" ", false), SLASH("/", "?", false), BACKSLASH("\\", "|", false), COMMA(",", "<", false), PERIOD(".",
 				">", false), GRAVE("`", "~", false), LSQUARE("[", "{", false), RSQUARE("]", "}", false), SEMICOLON(";",
 				":", false), APOSTROPHE("\'", "\"", false), MINUS("-", "_", false), EQUALS("=", "+", false), TAB(
@@ -25,7 +25,8 @@ public class Keyboard implements KeyListener {
 
 		//function keys
 		UP("up", true), DOWN("down", true), LEFT("left", true), RIGHT("right", true), ESC("esc", true), BACKSPACE(
-				"bksp", true), DEL("del", true), SHIFT("shift", true), CONTROL("control", true);
+				"bksp", true), DEL("del", true), SHIFT("shift", true), CONTROL("control", true), HOME("home", true), END(
+				"end", true);
 
 		public final String text, TEXT;
 		public boolean clicked, isFunctionKey;
@@ -107,6 +108,12 @@ public class Keyboard implements KeyListener {
 			break;
 		case KeyEvent.VK_DELETE:
 			Key.DEL.changed(pressed);
+			break;
+		case KeyEvent.VK_HOME:
+			Key.HOME.changed(pressed);
+			break;
+		case KeyEvent.VK_END:
+			Key.END.changed(pressed);
 			break;
 
 		//others

@@ -17,7 +17,7 @@ public class Button {
 	protected boolean visible = true;
 	private Color col, hovcol;
 
-	public Button(String text, int x, int y, int height, int width, Color col, Color hovcol) { //TODO add text rendering
+	public Button(String text, int x, int y, int height, int width, Color col, Color hovcol) {
 		this.text = text;
 		this.x = x;
 		this.y = y;
@@ -28,7 +28,7 @@ public class Button {
 	}
 
 	public Button(String text, int x, int y, int width, int height) {
-		this(text, x, y, height, width, Colour.btn, Colour.btn_hov);
+		this(text, x, y, height, width, Colour.BTN, Colour.BTN_HOV);
 	}
 
 	public void update() {

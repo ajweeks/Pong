@@ -35,7 +35,7 @@ public class ImageButton extends Button {
 		Image i;
 		if (hover) {
 			i = hovImage;
-			g.setColor(Colour.grayText);
+			g.setColor(Colour.GRAY_TEXT);
 		} else {
 			i = image;
 			g.setColor(Color.WHITE);

@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import ca.liqwidice.pong.Pong;
 import ca.liqwidice.pong.button.ButtonManager;
 import ca.liqwidice.pong.button.ImageButton;
+import ca.liqwidice.pong.input.Mouse;
 import ca.liqwidice.pong.input.Keyboard.Key;
 import ca.liqwidice.pong.level.Level;
 
@@ -33,6 +34,8 @@ public class GameState extends BasicState {
 
 	public void update() {
 		if (Key.ESC.clicked) level.setPaused(!level.isPaused());
+		if (Mouse.isStill() && !level.isGameOver() && !level.isPaused()) pong.setCursor(Pong.blankCursor);
+		else pong.setCursor(null);
 
 		manager.updateAll();
 

@@ -2,11 +2,15 @@ package ca.liqwidice.pong;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -27,6 +31,7 @@ public class Pong extends Canvas implements Runnable {
 	public static Mouse mouse;
 	public static Font font32 = new Font("Consolas", Font.BOLD, 32);
 	public static Font font16 = font32.deriveFont(16.0f);
+	public static Cursor blankCursor;
 
 	private JFrame frame;
 	private StateManager sm;
@@ -56,6 +61,9 @@ public class Pong extends Canvas implements Runnable {
 		sm.addState(new GameState(this));
 		sm.addState(new ServerBrowserState(this));
 
+		blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+				new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "blank cursor");
+
 		requestFocus();
 	}
 
@@ -74,7 +82,7 @@ public class Pong extends Canvas implements Runnable {
 	}
 
 	private void render(Graphics g) {
-		g.setColor(Colour.offBlack);
+		g.setColor(Colour.OFF_BLACK);
 		g.fillRect(0, 0, Pong.SIZE.width, Pong.SIZE.height);
 
 		sm.render(g);
@@ -125,6 +133,11 @@ public class Pong extends Canvas implements Runnable {
 		}
 		frame.dispose();
 		System.exit(0);
+	}
+
+	/** sets current cursor to c, unless c is null, then to the default cursor */
+	public void setCursor(Cursor c) {
+		frame.setCursor(c);
 	}
 
 	public StateManager getStateManager() {
