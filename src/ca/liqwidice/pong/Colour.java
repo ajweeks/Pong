@@ -8,4 +8,5 @@ public class Colour {
 	public static final Color OFF_BLACK = new Color(15, 15, 18);
 	public static final Color GRAY_TEXT = new Color(145, 135, 135);
 	public static final Color SELECTED_TEXT = new Color(128, 128, 128);
+	public static final Color SELECTED_TEXT_BG = new Color(15, 15, 15);
 }
