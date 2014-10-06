@@ -14,13 +14,19 @@ public class ServerBrowserState extends BasicState {
 
 	private ButtonManager manager;
 	private Pong pong;
-	private TextBox tb1 = new TextBox(20, 300, 180, 26);
-	private TextBox tb2 = new TextBox(20, 250, 375, 26);
+	private TextBox tb1 = new TextBox(20, 250, 375, 26);
+	private TextBox tb2 = new TextBox(20, 300, 180, 26);
 
 	public ServerBrowserState(Pong pong) {
 		this.pong = pong;
 		manager = new ButtonManager();
 		manager.addButton(new ImageButton("Main Menu", 15, 15, 215, 120));
+
+		tb1.setAcceptsLetters(true);
+		tb1.setAcceptsNumbers(false);
+
+		tb2.setAcceptsNumbers(true);
+		tb2.setAcceptsLetters(false);
 	}
 
 	public void update() {

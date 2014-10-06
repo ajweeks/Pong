@@ -30,6 +30,7 @@ public class Keyboard implements KeyListener {
 
 		public final String text, TEXT;
 		public boolean clicked, isFunctionKey;
+		public boolean isNumber = false, isLetter = false;
 		public int down = -1;
 
 		/** @param text - the string to be printed when this key is down
@@ -38,10 +39,16 @@ public class Keyboard implements KeyListener {
 			this.text = text;
 			this.TEXT = TEXT;
 			this.isFunctionKey = isFunctionKey;
+
+			if (text.matches("^[a-zA-Z_]*$")) {
+				isLetter = true;
+			} else if (text.matches("^[0-9]*$")) {
+				isNumber = true;
+			}
 		}
 
-		Key(String s, boolean isAlphaNumeric) {
-			this(s, s.toUpperCase(), isAlphaNumeric);
+		Key(String s, boolean isFunctionKey) {
+			this(s, s.toUpperCase(), isFunctionKey);
 		}
 
 		public void update() {
@@ -56,6 +63,26 @@ public class Keyboard implements KeyListener {
 			if (pressed) down++;
 			else down = -1;
 		}
+	}
+
+	public static boolean capsLock = false;
+	private static boolean capsChanged = false;
+
+	public static boolean insert = false;
+	private static boolean insertChanged = false;
+
+	private static void updateCaps(boolean pressed) {
+		if (!capsChanged && pressed) {
+			capsChanged = true;
+			capsLock = !capsLock;
+		} else if (!pressed) capsChanged = false; // only reset capsChanged variable once the caps is released (prevents switching back and forth repeatedly)
+	}
+
+	private static void updateInsert(boolean pressed) {
+		if (!insertChanged && pressed) {
+			insertChanged = true;
+			insert = !insert;
+		} else if (!pressed) insertChanged = false; // only reset insertChanged variable once insert is released (prevents switching back and forth repeatedly)
 	}
 
 	public void update() {
@@ -114,6 +141,12 @@ public class Keyboard implements KeyListener {
 			break;
 		case KeyEvent.VK_END:
 			Key.END.changed(pressed);
+			break;
+		case KeyEvent.VK_INSERT:
+			updateInsert(pressed);
+			break;
+		case KeyEvent.VK_CAPS_LOCK:
+			updateCaps(pressed);
 			break;
 
 		//others
