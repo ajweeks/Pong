@@ -1,6 +1,7 @@
 package ca.liqwidice.pong.button;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 
 import ca.liqwidice.pong.Colour;
@@ -15,9 +16,10 @@ public class Button {
 	protected boolean clicked = false;
 	protected boolean down = false;
 	protected boolean visible = true;
+	protected Font font;
 	private Color col, hovcol;
 
-	public Button(String text, int x, int y, int height, int width, Color col, Color hovcol) {
+	public Button(String text, int x, int y, int height, int width, Color col, Color hovcol, Font font) {
 		this.text = text;
 		this.x = x;
 		this.y = y;
@@ -25,14 +27,18 @@ public class Button {
 		this.height = height;
 		this.col = col;
 		this.hovcol = hovcol;
+		this.font = font;
 	}
 
 	public Button(String text, int x, int y, int width, int height) {
-		this(text, x, y, height, width, Colour.BTN, Colour.BTN_HOV);
+		this(text, x, y, height, width, Colour.BTN, Colour.BTN_HOV, Pong.font32);
 	}
 
 	public void update() {
-		if (!visible) return;
+		if (!visible) {
+			clicked = false;
+			return;
+		}
 		if (Pong.mouse.getX() > x && Pong.mouse.getX() < x + width && Pong.mouse.getY() > y
 				&& Pong.mouse.getY() < y + height) {
 			hover = true;
@@ -46,7 +52,6 @@ public class Button {
 		} else hover = false;
 		down = false;
 		clicked = false;
-		return;
 	}
 
 	public void render(Graphics g) {
@@ -56,7 +61,7 @@ public class Button {
 		g.fillRect(x, y, width, height);
 
 		g.setColor(Color.WHITE);
-		g.setFont(Pong.font32);
+		g.setFont(font);
 		g.drawString(text, x + (width / 2) - (g.getFontMetrics().stringWidth(text) / 2), y + (height / 2) + 8);
 	}
 

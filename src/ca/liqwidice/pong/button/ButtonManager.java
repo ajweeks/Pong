@@ -1,11 +1,11 @@
 package ca.liqwidice.pong.button;
 
 import java.awt.Graphics;
-import java.util.ArrayList;
+import java.util.Vector;
 
 public class ButtonManager {
 
-	private ArrayList<Button> buttons = new ArrayList<>();
+	private Vector<Button> buttons = new Vector<>();
 
 	public void updateAll() {
 		for (int i = 0; i < buttons.size(); i++) {
@@ -23,8 +23,11 @@ public class ButtonManager {
 		buttons.add(button);
 	}
 
-	public Button getButton(int index) {
-		return buttons.get(index);
+	public Button getButton(String s) {
+		for (Button b : buttons) {
+			if (b.text.equals(s)) return b;
+		}
+		return null;
 	}
 
 }

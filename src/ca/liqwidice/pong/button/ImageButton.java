@@ -7,7 +7,6 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 import ca.liqwidice.pong.Colour;
-import ca.liqwidice.pong.Pong;
 
 public class ImageButton extends Button {
 
@@ -42,8 +41,7 @@ public class ImageButton extends Button {
 		}
 		g.drawImage(i, x, y, width, height, null);
 
-		g.setFont(Pong.font32);
+		g.setFont(font);
 		g.drawString(text, x + (width / 2) - (g.getFontMetrics().stringWidth(text) / 2), y + (height / 2) + 8);
 	}
-
 }
