@@ -7,6 +7,4 @@ public abstract class BasicState {
 	public abstract void update();
 
 	public abstract void render(Graphics g);
-
-	public abstract int getID();
 }

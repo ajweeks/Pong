@@ -7,9 +7,13 @@ import java.awt.Rectangle;
 import ca.liqwidice.pong.Pong;
 import ca.liqwidice.pong.sound.Sound;
 
-public class Ball extends Rectangle {
+public class Ball extends Rectangle { //a ball that's really a rectangle
 	private static final long serialVersionUID = 1L;
 
+	public static final int DEFAULT_X = 1;
+	public static final int DEFAULT_Y = 1;
+	public static final int WIDTH = 0;
+	
 	private double xv, yv;
 	private int lastX, lastY;
 	private boolean offScreen = false;
@@ -50,11 +54,11 @@ public class Ball extends Rectangle {
 		}
 	}
 
-	/** @return a ball at x, y with a randomized xv and yv */
-	public static Ball newBall(Level level, boolean towardsPlayer) {
+	/** @return a ball at the centre of the sceen with an xv towards player1 if towardsPlayer1 is true */
+	public static Ball newBall(Level level, boolean towardsPlayer1) {
 		double yv = (Math.random() * Level.BALL_XV) - Level.BALL_XV / 2;
 		double xv = Level.BALL_XV;
-		if (towardsPlayer) xv = -xv;
+		if (towardsPlayer1) xv = -xv;
 		return new Ball(348, 225, xv, yv, 20);
 	}
 

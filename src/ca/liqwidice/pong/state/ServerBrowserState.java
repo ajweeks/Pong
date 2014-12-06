@@ -10,44 +10,50 @@ import ca.liqwidice.pong.input.Keyboard.Key;
 
 public class ServerBrowserState extends BasicState {
 
-	public static int MAIN_MENU = 0;
+	public static final String MAIN_MENU = "MAIN MENU";
+	public static final String NEW_SERVER = "NEW SERVER";
+	public static final String JOIN_SERVER = "JOIN SERVER";
 
 	private ButtonManager manager;
 	private Pong pong;
-	private TextBox tb1 = new TextBox(20, 250, 375, 26);
-	private TextBox tb2 = new TextBox(20, 300, 180, 26);
+
+	private TextBox portInput;
 
 	public ServerBrowserState(Pong pong) {
 		this.pong = pong;
 		manager = new ButtonManager();
-		manager.addButton(new ImageButton("Main Menu", 15, 15, 215, 120));
-
-		tb1.setAcceptsLetters(true);
-		tb1.setAcceptsNumbers(false);
-
-		tb2.setAcceptsNumbers(true);
-		tb2.setAcceptsLetters(false);
+		manager.addButton(new ImageButton(MAIN_MENU, 15, 15, 250, 85));
+		manager.addButton(new ImageButton(NEW_SERVER, Pong.SIZE.width / 2 - 250 / 2,
+				Pong.SIZE.height / 2 - 85 / 2 - 50, 250, 85));
+		portInput = new TextBox(Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 85 / 2 + 115, 250, 25);
+		portInput.setAcceptsLetters(false);
+		portInput.setAcceptsSpecialCharacters(false);
+		manager.addButton(new ImageButton(JOIN_SERVER, Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 85 / 2
+				+ 150, 250, 85));
 	}
 
 	public void update() {
 		manager.updateAll();
 
 		if (manager.getButton(MAIN_MENU).isClicked() || Key.ESC.clicked) {
-			pong.getStateManager().enterState(StateManager.MAIN_MENU_STATE);
+			pong.getStateManager().enterPreviousState();
+		} else if (manager.getButton(NEW_SERVER).isClicked()) {
+			pong.getStateManager().addState(new ServerHostState(pong));
+		} else if (manager.getButton(JOIN_SERVER).isClicked()) {
+			pong.getStateManager().addState(new ServerJoinState(pong));
+			((ServerJoinState) pong.getStateManager().getCurrentState()).setPort("localhost",
+					Integer.parseInt(portInput.getText()));
 		}
 
-		tb1.update();
-		tb2.update();
+		portInput.update();
 	}
 
 	public void render(Graphics g) {
 		manager.renderAll(g);
-
-		tb1.render(g);
-		tb2.render(g);
+		portInput.render(g);
 	}
 
-	public int getID() {
-		return StateManager.SERVER_BROWSER_STATE;
+	public void clearPort() {
+		portInput.clear();
 	}
 }

@@ -1,44 +1,39 @@
 package ca.liqwidice.pong.state;
 
 import java.awt.Graphics;
-import java.util.ArrayList;
-
-import ca.liqwidice.pong.Pong;
+import java.util.Vector;
 
 public class StateManager {
 
-	public static final int MAIN_MENU_STATE = 0;
-	public static final int GAME_STATE = 1;
-	public static final int SERVER_BROWSER_STATE = 2;
+	private Vector<BasicState> states = new Vector<>();
 
-	private ArrayList<BasicState> states = new ArrayList<>();
-	private BasicState currentState;
+	public StateManager(BasicState firstState) {
+		states.add(firstState);
+	}
 
 	public void update() {
-		currentState.update();
+		states.lastElement().update();
 	}
 
 	public void render(Graphics g) {
-		currentState.render(g);
+		states.lastElement().render(g);
 	}
 
-	public void enterState(int stateID) {
-		Pong.keyboard.releaseAll();
-		Pong.mouse.releaseAll();
-		currentState = states.get(stateID);
-	}
-
-	public int getCurrnetStateID() {
-		return currentState.getID();
+	public void enterPreviousState() {
+		if (states.size() > 1) states.remove(states.lastElement());
 	}
 
 	public BasicState getCurrentState() {
-		return currentState;
+		return states.lastElement();
 	}
 
 	public void addState(BasicState state) {
-		if (states.size() == 0) currentState = state;
 		states.add(state);
 	}
 
+	//	public void enterState(int stateID) {
+	//		Pong.keyboard.releaseAll();
+	//		Pong.mouse.releaseAll();
+	//		states.add(states.get(stateID));
+	//	}
 }

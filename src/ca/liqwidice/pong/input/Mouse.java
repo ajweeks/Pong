@@ -17,8 +17,8 @@ public class Mouse implements MouseMotionListener, MouseListener {
 	}
 
 	public void update() {
-		leftClicked = false;
-		rightClicked = false;
+		if (leftClicked) leftClicked = false;
+		if (rightClicked) rightClicked = false;
 	}
 
 	public void releaseAll() {

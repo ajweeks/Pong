@@ -18,9 +18,7 @@ import javax.swing.JFrame;
 import ca.liqwidice.pong.input.Keyboard;
 import ca.liqwidice.pong.input.Keyboard.Key;
 import ca.liqwidice.pong.input.Mouse;
-import ca.liqwidice.pong.state.GameState;
 import ca.liqwidice.pong.state.MainMenuState;
-import ca.liqwidice.pong.state.ServerBrowserState;
 import ca.liqwidice.pong.state.StateManager;
 
 public class Pong extends Canvas implements Runnable {
@@ -37,8 +35,8 @@ public class Pong extends Canvas implements Runnable {
 	private StateManager sm;
 	private Image icon = new ImageIcon("res/icon.png").getImage();
 
-	private boolean hasFocus = false;
 	private boolean running = false;
+	private int fps = 0;
 
 	public Pong() {
 		super();
@@ -56,10 +54,7 @@ public class Pong extends Canvas implements Runnable {
 		keyboard = new Keyboard(this);
 		mouse = new Mouse(this);
 
-		sm = new StateManager();
-		sm.addState(new MainMenuState(this));
-		sm.addState(new GameState(this));
-		sm.addState(new ServerBrowserState(this));
+		sm = new StateManager(new MainMenuState(this));
 
 		blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
 				new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "blank cursor");
@@ -75,9 +70,8 @@ public class Pong extends Canvas implements Runnable {
 		if (Key.W.clicked && Key.CONTROL.down > -1) {
 			stop();
 		}
-		hasFocus = this.hasFocus();
 		sm.update();
-		keyboard.update(); //set's all clicked values to false!
+		keyboard.update();
 		mouse.update();
 	}
 
@@ -94,7 +88,6 @@ public class Pong extends Canvas implements Runnable {
 		long before = System.nanoTime();
 		long elapsed = 0;
 		int frames = 0;
-		int fps = 0;
 		while (running) {
 			long now = System.nanoTime();
 			elapsed += now - before;
@@ -118,9 +111,9 @@ public class Pong extends Canvas implements Runnable {
 				frames = 0;
 			}
 
-			g.setColor(Color.WHITE);
-			g.setFont(new Font("Consolas", Font.BOLD, 16));
-			g.drawString(fps + " FPS", 8, 16);
+			//g.setColor(Color.WHITE);
+			//g.setFont(new Font("Consolas", Font.BOLD, 16));
+			//g.drawString(fps + " FPS", 8, 16);
 
 			g.dispose();
 			buffer.show();
@@ -142,10 +135,6 @@ public class Pong extends Canvas implements Runnable {
 
 	public StateManager getStateManager() {
 		return sm;
-	}
-
-	public boolean hasFocus() {
-		return hasFocus;
 	}
 
 	public void stop() {
