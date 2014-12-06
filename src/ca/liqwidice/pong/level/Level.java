@@ -3,9 +3,11 @@ package ca.liqwidice.pong.level;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import ca.liqwidice.pong.Colour;
 import ca.liqwidice.pong.Pong;
 import ca.liqwidice.pong.input.Keyboard.Key;
 import ca.liqwidice.pong.paddle.AIPaddle;
+import ca.liqwidice.pong.paddle.Paddle;
 import ca.liqwidice.pong.paddle.PlayerPaddle;
 import ca.liqwidice.pong.sound.Sound;
 
@@ -16,51 +18,57 @@ public class Level {
 	public static final int WINNING_SCORE = 11;
 
 	private Ball ball;
-	private PlayerPaddle player;
-	private AIPaddle ai;
+	private Paddle player1;
+	private Paddle player2;
+
+	private int ticks = 0;
 	private boolean paused = false;
-	private int playerScore = 0, aiScore = 0;
+	private int player1Score = 0, player2Score = 0;
 	private boolean gameOver = false;
 
-	public Level() {
+	/** @param player1 is the paddle on the left, 
+	 *  @param player2 is the paddle on the right */
+	public Level(Paddle player1, Paddle player2) {
 		ball = Ball.newBall(this, false);
-		player = new PlayerPaddle(50, Pong.SIZE.height / 2 - 50, 25, 100);
-		ai = new AIPaddle(Pong.SIZE.width - 75, Pong.SIZE.height / 2 - 50, 25, 100, AIPaddle.HARD_SPEED); //TODO add level difficulty selection
+		this.player1 = player1;
+		this.player2 = player2;
 	}
 
 	public void update() {
+		ticks++;
 		if (paused) return;
 
-		if (playerScore >= WINNING_SCORE || aiScore >= WINNING_SCORE) {
+		if (player1Score >= WINNING_SCORE || player2Score >= WINNING_SCORE) {
 			gameOver = true;
 		}
 		if (gameOver) return;
 
-		player.update();
+		player1.update(ball);
+		player2.update(ball);
 		ball.update();
-		ai.update(ball);
-
 		if (ball.isOffScreen()) {
 			resetBall();
 		}
 
-		//PLAYER
-		if (ball.x < player.x + player.width && (ball.y + ball.height > player.y && ball.y < player.y + player.height)) { //ball is hitting top or bottom of paddle
-			if (ball.x < player.x) return;
-			float halfHeight = player.height / 2;
-			float angle = ((player.y + (player.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
-			ball.x = player.x + player.width;
+		//PLAYER 1
+		if (ball.x < player1.x + player1.width
+				&& (ball.y + ball.height > player1.y && ball.y < player1.y + player1.height)) { //ball is hitting top or bottom of paddle
+			if (ball.x < player1.x) return; //ball went all the way through the paddle
+			float halfHeight = player1.height / 2;
+			float angle = ((player1.y + (player1.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
+			ball.x = player1.x + player1.width;
 			ball.setXv(-ball.getXv());
 			ball.setYv(-angle * Level.BALL_XV);
 			Sound.boop.play();
 		}
 
-		//AI
-		if (ball.x + ball.width > ai.x && (ball.y + ball.height > ai.y && ball.y < ai.y + ai.height)) { //ball is hitting top or bottom of paddle
-			if (ball.x > ai.x + ai.width) return;
-			float halfHeight = ai.height / 2;
-			float angle = ((ai.y + (ai.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
-			ball.x = ai.x - ball.width;
+		//PLAYER 2
+		if (ball.x + ball.width > player2.x
+				&& (ball.y + ball.height > player2.y && ball.y < player2.y + player2.height)) { //ball is hitting top or bottom of paddle
+			if (ball.x > player2.x + player2.width) return; //ball went all the way through the paddle
+			float halfHeight = player2.height / 2;
+			float angle = ((player2.y + (player2.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
+			ball.x = player2.x - ball.width;
 			ball.setXv(-ball.getXv());
 			ball.setYv(-angle);
 			Sound.boop.play();
@@ -69,23 +77,25 @@ public class Level {
 
 	public void resetBall() {
 		if (ball.x - ball.width < 0) {
-			aiScore++;
+			player2Score++;
 			Sound.lose.play();
 			ball = Ball.newBall(this, false);
 		} else if (ball.x > Pong.SIZE.width) {
-			playerScore++;
+			player1Score++;
 			Sound.win.play();
 			ball = Ball.newBall(this, true);
 		} else {
-			System.out.println("no one scored!!");
+			System.err.println("no one scored!!");
 			return;
 		}
 	}
 
 	public void resetGame() {
 		gameOver = false;
-		playerScore = 0;
-		aiScore = 0;
+		player1Score = 0;
+		player1.reset();
+		player2Score = 0;
+		player2.reset();
 	}
 
 	public void render(Graphics g) {
@@ -94,23 +104,28 @@ public class Level {
 			return;
 		}
 		if (gameOver) {
-			g.setColor(Color.GREEN);
-			if (aiScore >= WINNING_SCORE) {
+			if (player2Score >= WINNING_SCORE) {
+				g.setColor(Colour.WINNER_BG);
 				g.fillRect(Pong.SIZE.width / 2, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
-			}
-			if (playerScore >= WINNING_SCORE) {
+				g.setColor(Colour.LOSER_BG);
 				g.fillRect(0, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
+			} else {
+				g.setColor(Colour.WINNER_BG);
+				g.fillRect(0, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
+				g.setColor(Colour.LOSER_BG);
+				g.fillRect(Pong.SIZE.width / 2, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
 			}
 		}
 
 		ball.render(g);
-		player.render(g);
-		ai.render(g);
+		player1.render(g);
+		player2.render(g);
 
 		g.setFont(Pong.font32);
 		g.setColor(Color.WHITE);
-		g.drawString(playerScore + "", Pong.SIZE.width / 2 - 50 - g.getFontMetrics().stringWidth(playerScore + ""), 24);
-		g.drawString(aiScore + "", Pong.SIZE.width / 2 + 50, 24);
+		g.drawString(player1Score + "", Pong.SIZE.width / 2 - 50 - g.getFontMetrics().stringWidth(player1Score + ""),
+				24);
+		g.drawString(player2Score + "", Pong.SIZE.width / 2 + 50, 24);
 
 		for (int i = 0; i < 8; i++) {
 			g.fillRect(Pong.SIZE.width / 2 - 6, i * 65 - 10, 12, 45); //midfield lines
@@ -119,9 +134,61 @@ public class Level {
 		if (paused) {
 			g.setColor(new Color(25, 25, 25, 150));
 			g.fillRect(0, 0, Pong.SIZE.width, Pong.SIZE.height);
-			g.setColor(Color.WHITE);
+			if (ticks < 30) {
+				g.setColor(Color.WHITE);
+			} else {
+				g.setColor(Color.GRAY);
+			}
+			if (ticks > 60) ticks = 0;
 			g.drawString("PAUSED", (Pong.SIZE.width / 2) - (g.getFontMetrics().stringWidth("PAUSED") / 2), 200);
 		}
+	}
+
+	public void setDifficulty(float speed) {
+		if (player2 instanceof AIPaddle) {
+			((AIPaddle) player2).setSpeed(speed);
+		} else System.err.println("player2 isn't an ai! You can't change it's difficulty");
+	}
+
+	public static Level getDefaultPVAILevel() {
+		return new Level(
+				new PlayerPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, true, true),
+				new AIPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, AIPaddle.MEDIUM_SPEED));
+	}
+
+	public static Level getDefaultPVPLevel() {
+		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, false,
+				true), new PlayerPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, true, false));
+	}
+
+	public static Level getDefaultAIVAILevel() {
+		return new Level(new AIPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT,
+				AIPaddle.HARD_SPEED), new AIPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT,
+				AIPaddle.HARD_SPEED));
+	}
+
+	public int getPlayer1X() {
+		return player1.x;
+	}
+
+	public int getPlayer1Y() {
+		return player1.y;
+	}
+
+	public int getPlayer2X() {
+		return player2.x;
+	}
+
+	public int getPlayer2Y() {
+		return player2.y;
+	}
+
+	public int getBallX() {
+		return ball.x;
+	}
+
+	public int getBallY() {
+		return ball.y;
 	}
 
 	public boolean isGameOver() {
