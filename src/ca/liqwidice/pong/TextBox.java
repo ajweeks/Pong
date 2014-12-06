@@ -9,8 +9,8 @@ import ca.liqwidice.pong.input.Keyboard.Key;
 
 public class TextBox {
 
-	private static final int DEFAULT_BLINK_RATE = 30;
-	private static final int DEFAULT_DELAY = 45;
+	private static final int DEFAULT_BLINK_RATE = 25;
+	private static final int DEFAULT_DELAY = 30;
 
 	private int x, y, width, height;
 	private Font font;
@@ -21,16 +21,14 @@ public class TextBox {
 
 	private int delay = 0; //how many ticks to wait after a key has been held down before printing that key repeatedly
 	private int blinkRate; //The number of ticks to wait before turning cursor on/off
-	private boolean cursorOn = true; //Whether or not the cursor is being shown this frame (used for blinking effect)
+	private String cursor = ""; //The current cursor (can be "|", "_", or " ")
 	private int cursorStart = 0; //The number of chars to the left of the start of the current selection
 	private int cursorEnd = 0; //The number of chars to the left of the end of the current selection
 	private int ticks = 0;
 	private boolean full = false; //is true once no more characters can fit in
 	private boolean acceptsNumbers = true;
 	private boolean acceptsLetters = true;
-	private boolean acceptsSpecialCharacters = true; //TODO implement this
-
-	//TODO add insert mode?
+	private boolean acceptsSpecialCharacters = true;
 
 	public TextBox(int x, int y, int width, int height, Font font, Color backgroundColor,
 			Color selectionBackgroundColour, Color fontColor, Color selectionColour, int blinkRate, int delay) {
@@ -52,12 +50,17 @@ public class TextBox {
 				DEFAULT_BLINK_RATE, DEFAULT_DELAY);
 	}
 
+	private void turnCursorOn() {
+		ticks = 0;
+		if (Keyboard.insert) cursor = "_";
+		else cursor = "|";
+	}
+
 	public void update() {
 		if (Pong.mouse.isLeftClicked()) {
 			if (Pong.mouse.getX() > x && Pong.mouse.getX() < x + width && Pong.mouse.getY() > y
 					&& Pong.mouse.getY() < y + height) {
 				hasFocus = true;
-				//TODO set the cursor position to the mouse position
 			} else {
 				hasFocus = false;
 			}
@@ -67,7 +70,14 @@ public class TextBox {
 
 		if (ticks++ > blinkRate) {
 			ticks = 0;
-			cursorOn = !cursorOn;
+			if (!hasFocus) cursor = "";
+			else if (Keyboard.insert) {
+				if (cursor.equals("")) cursor = "_";
+				else cursor = "";
+			} else {
+				if (cursor.equals("")) cursor = "|";
+				else cursor = "";
+			}
 		}
 
 		if (Key.BACKSPACE.down > delay) backspace();
@@ -75,7 +85,7 @@ public class TextBox {
 
 		Key[] keys = Key.values();
 		for (int i = 0; i < keys.length; i++) {
-			if (keys[i].isFunctionKey) continue;
+			if (keys[i].isFunctionKey) continue; //Don't print out function keys!
 			if (Key.CONTROL.down != -1) continue; //Don't print out characters if the user if holding down control
 			if (keys[i].down > delay) {
 				addCharacter(keys[i]);
@@ -85,8 +95,7 @@ public class TextBox {
 		}
 
 		if (Key.RIGHT.clicked || Key.RIGHT.down > delay) {
-			ticks = 0;
-			cursorOn = true;
+			turnCursorOn();
 			if (Key.CONTROL.down > -1) {
 				if (Key.SHIFT.down > -1) {
 					cursorEnd = nextSpaceToRight(cursorEnd);
@@ -96,8 +105,7 @@ public class TextBox {
 				}
 			} else moveCursorRight();
 		} else if (Key.LEFT.clicked || Key.LEFT.down > delay) {
-			ticks = 0;
-			cursorOn = true;
+			turnCursorOn();
 			if (Key.CONTROL.down > -1) {
 				if (Key.SHIFT.down > -1) {
 					cursorEnd = nextSpaceToLeft(cursorEnd);
@@ -110,6 +118,7 @@ public class TextBox {
 		cursorClamp();
 
 		if (Key.HOME.clicked) {
+			turnCursorOn();
 			if (Key.SHIFT.down > -1) {
 				cursorStart = 0;
 			} else {
@@ -117,6 +126,7 @@ public class TextBox {
 				cursorEnd = cursorStart;
 			}
 		} else if (Key.END.clicked) {
+			turnCursorOn();
 			if (Key.SHIFT.down > -1) {
 				cursorEnd = text.length();
 			} else {
@@ -155,6 +165,38 @@ public class TextBox {
 
 		if (Key.BACKSPACE.clicked) backspace();
 		if (Key.DEL.clicked) del();
+	}
+
+	public void render(Graphics g) {
+		g.setFont(font);
+		if (hasFocus) {
+			g.setColor(Color.BLUE);
+			g.fillRect(x - 2, y - 2, width + 4, height + 4);
+		}
+
+		g.setColor(backgroundColour);
+		g.fillRect(x, y, width, height);
+
+		full = false;
+		while (g.getFontMetrics().stringWidth(text + g.getFontMetrics().getMaxAdvance()) > width) {
+			full = true;
+			text = text.substring(0, text.length() - 1);
+		}
+
+		//LATER add mouse cursor selection
+		int xo = 0;
+
+		for (int i = 0; i < text.length(); i++) {
+			if (cursorEnd == cursorStart && cursorEnd == i && hasFocus) { //nothing is selected
+				g.setColor(textColour);
+				g.drawString(cursor, x + xo - 4, y + 16);
+			}
+			xo += drawChar(i, x + xo, y + 16, g);
+		}
+		if (cursorEnd == text.length() && cursorStart == cursorEnd && hasFocus) {
+			g.setColor(textColour);
+			g.drawString(cursor, x + xo - 4, y + 16);
+		}
 	}
 
 	/** @return the next space character to the right of the current index position in the text OR the length of the text if there are no spaces to the right */
@@ -215,51 +257,23 @@ public class TextBox {
 		}
 	}
 
-	public void render(Graphics g) {
-		g.setFont(font);
-		if (hasFocus) {
-			g.setColor(Color.BLUE);
-			g.fillRect(x - 2, y - 2, width + 4, height + 4);
+	private void cursorClamp() {
+		if (text.length() == 0) {
+			cursorStart = 0;
+			cursorEnd = 0;
+			return;
 		}
 
-		g.setColor(backgroundColour);
-		g.fillRect(x, y, width, height);
+		if (cursorStart < 0) cursorStart = 0;
+		if (cursorEnd < 0) cursorEnd = 0;
 
-		if (g.getFontMetrics().stringWidth(text + g.getFontMetrics().getMaxAdvance()) > width) {
-			while (g.getFontMetrics().stringWidth(text + g.getFontMetrics().getMaxAdvance()) > width) {
-				text = text.substring(0, text.length() - 1);
-			}
-			full = true;
-		} else full = false;
-
-		int xo = 0;
-		String cursorString = cursorOn ? Keyboard.insert ? "_" : "|" : ""; //TODO fix insert cursor rendering
-		for (int i = 0; i < text.length(); i++) {
-			if (cursorEnd == cursorStart && cursorEnd == i && hasFocus) { //nothing is selected
-				g.setColor(textColour);
-				g.drawString(cursorString, x + xo - 4, y + 16);
-			}
-			xo += drawChar(i, x + xo, y + 16, g);
-		}
-		if (cursorEnd == text.length() && cursorStart == cursorEnd && hasFocus) {
-			g.setColor(textColour);
-			g.drawString(cursorString, x + xo - 4, y + 16);
-		}
+		if (cursorStart > text.length()) cursorStart = text.length();
+		if (cursorEnd > text.length()) cursorEnd = text.length();
 	}
 
-	private int drawChar(int index, int x, int y, Graphics g) {
-		int w = g.getFontMetrics().stringWidth(String.valueOf(text.charAt(index)));
-		//TODO add mouse cursor selection
-		if (hasFocus
-				&& ((cursorStart < cursorEnd && index >= cursorStart && index < cursorEnd) || (cursorStart > cursorEnd
-						&& index < cursorStart && index >= cursorEnd))) { //this character is selected
-			g.setColor(selectionBackgroundColour);
-			g.fillRect(x, y - 16, w, height); //highlight it
-
-			g.setColor(selectedTextColour);
-		} else g.setColor(textColour);
-		g.drawString(String.valueOf(text.charAt(index)), x, y);
-		return w;
+	public void clear() {
+		text = "";
+		cursorClamp();
 	}
 
 	/** Deletes one character behind the cursor if nothing is selected.
@@ -283,8 +297,7 @@ public class TextBox {
 		cursorEnd = cursorStart;
 		cursorClamp();
 
-		ticks = 0; //deleting resets blinker timer
-		cursorOn = true;
+		turnCursorOn();
 	}
 
 	/** Deletes one character in front of the cursor if nothing is selected.
@@ -309,8 +322,7 @@ public class TextBox {
 			text = text.substring(0, cursorStart) + text.substring(cursorStart + 1);
 		}
 
-		ticks = 0; //deleting resets blinker timer
-		cursorOn = true;
+		turnCursorOn();
 	}
 
 	public void addString(String s) {
@@ -324,13 +336,16 @@ public class TextBox {
 		cursorEnd = cursorStart;
 		cursorClamp();
 
-		ticks = 0; //typing resets blinker timer
-		cursorOn = true;
-
+		turnCursorOn();
 	}
 
 	public void addCharacter(Key k) {
-		if (k.isNumber && !acceptsNumbers) return;
+		if (k.isNumber) {
+			if (!acceptsNumbers) return;
+			if (Key.SHIFT.down > -1) {
+				if (!acceptsSpecialCharacters) return;
+			}
+		}
 		if (k.isLetter && !acceptsLetters) return;
 		if (cursorStart != cursorEnd) { //some text is selected
 			backspace(); //delete it
@@ -362,26 +377,25 @@ public class TextBox {
 		cursorEnd = cursorStart;
 		cursorClamp();
 
-		ticks = 0; //typing resets blinker timer
-		cursorOn = true;
+		turnCursorOn();
 	}
 
-	private void cursorClamp() {
-		if (text.length() == 0) {
-			cursorStart = 0;
-			cursorEnd = 0;
-		}
-
-		if (cursorStart < 0) cursorStart = 0;
-		if (cursorEnd < 0) cursorEnd = 0;
-
-		if (cursorStart > text.length()) cursorStart = text.length();
-		if (cursorEnd > text.length()) cursorEnd = text.length();
+	public String getText() {
+		return text;
 	}
 
-	public void clear() {
-		text = "";
-		cursorClamp();
+	private int drawChar(int index, int x, int y, Graphics g) {
+		int w = g.getFontMetrics().stringWidth(String.valueOf(text.charAt(index)));
+		if (hasFocus
+				&& ((cursorStart < cursorEnd && index >= cursorStart && index < cursorEnd) || (cursorStart > cursorEnd
+						&& index < cursorStart && index >= cursorEnd))) { //this character is selected
+			g.setColor(selectionBackgroundColour);
+			g.fillRect(x, y - 16, w, height); //highlight it
+
+			g.setColor(selectedTextColour);
+		} else g.setColor(textColour);
+		g.drawString(String.valueOf(text.charAt(index)), x, y);
+		return w;
 	}
 
 	public void setAcceptsLetters(boolean acceptsLetters) {
