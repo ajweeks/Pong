@@ -18,8 +18,8 @@ public class Level {
 	public static final int WINNING_SCORE = 11;
 
 	private Ball ball;
-	private Paddle player1;
-	private Paddle player2;
+	private Paddle player1; //the paddle on the left side of the screen
+	private Paddle player2; //the paddle on the right of the screen
 
 	private int ticks = 0;
 	private boolean paused = false;
@@ -104,16 +104,25 @@ public class Level {
 			return;
 		}
 		if (gameOver) {
+			g.setFont(Pong.font32);
 			if (player2Score >= WINNING_SCORE) {
 				g.setColor(Colour.WINNER_BG);
 				g.fillRect(Pong.SIZE.width / 2, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
+				g.setColor(Color.WHITE);
+				g.drawString("WINNER!", 500, 200);
 				g.setColor(Colour.LOSER_BG);
 				g.fillRect(0, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
+				g.setColor(Color.WHITE);
+				g.drawString("LOSER", 120, 200);
 			} else {
 				g.setColor(Colour.WINNER_BG);
 				g.fillRect(0, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
+				g.setColor(Color.WHITE);
+				g.drawString("WINNER!", 120, 200);
 				g.setColor(Colour.LOSER_BG);
 				g.fillRect(Pong.SIZE.width / 2, 0, Pong.SIZE.width / 2, Pong.SIZE.height);
+				g.setColor(Color.WHITE);
+				g.drawString("LOSER", 500, 200);
 			}
 		}
 
@@ -144,6 +153,22 @@ public class Level {
 		}
 	}
 
+	public Paddle getPlayer1() {
+		return player1;
+	}
+
+	public Paddle getPlayer2() {
+		return player2;
+	}
+
+	public void movePlayer1(int newY) {
+		player1.y = newY;
+	}
+
+	public void movePlayer2(int newY) {
+		player2.y = newY;
+	}
+
 	public void setDifficulty(float speed) {
 		if (player2 instanceof AIPaddle) {
 			((AIPaddle) player2).setSpeed(speed);
@@ -151,14 +176,21 @@ public class Level {
 	}
 
 	public static Level getDefaultPVAILevel() {
-		return new Level(
-				new PlayerPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, true, true),
-				new AIPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, AIPaddle.MEDIUM_SPEED));
+		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, true,
+				true, true), new AIPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT,
+				AIPaddle.MEDIUM_SPEED));
 	}
 
-	public static Level getDefaultPVPLevel() {
+	public static Level getDefaultLocalPVPLevel() {
 		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, false,
-				true), new PlayerPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, true, false));
+				true, false), new PlayerPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT,
+				false, false, true));
+	}
+
+	public static Level getDefaultNetworkPVPLevel() {
+		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, true,
+				true, true), new PlayerPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, false,
+				false, false));
 	}
 
 	public static Level getDefaultAIVAILevel() {

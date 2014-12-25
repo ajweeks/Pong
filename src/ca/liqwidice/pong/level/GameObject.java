@@ -1,4 +1,4 @@
-package ca.liqwidice.pong.state;
+package ca.liqwidice.pong.level;
 
 import java.awt.Graphics;
 
@@ -7,10 +7,10 @@ import ca.liqwidice.pong.button.ButtonManager;
 import ca.liqwidice.pong.button.ImageButton;
 import ca.liqwidice.pong.input.Keyboard.Key;
 import ca.liqwidice.pong.input.Mouse;
-import ca.liqwidice.pong.level.Level;
+import ca.liqwidice.pong.state.BasicState;
 
 /** Single player game state */
-public class GameState extends BasicState {
+public class GameObject extends BasicState {
 
 	private static final String RESUME = "RESUME";
 	private static final String MAIN_MENU = "MAIN MENU";
@@ -20,15 +20,16 @@ public class GameState extends BasicState {
 	private ButtonManager manager;
 	private Pong pong;
 
-	public GameState(Pong pong, Level level) {
+	public GameObject(Pong pong, Level level) {
+		//TODO let players select which input method they want to use (using radio buttons?)
 		this.pong = pong;
 		this.level = level;
 		manager = new ButtonManager();
 
-		manager.addButton(new ImageButton(RESUME, Pong.SIZE.width / 2 - 175 / 2, 250, 175, 80));
-		manager.addButton(new ImageButton(MAIN_MENU, Pong.SIZE.width / 2 - 175 / 2, 340, 175, 80));
+		manager.addButton(new ImageButton(RESUME, Pong.SIZE.width / 2 - 175 / 2, 230, 175, 80));
+		manager.addButton(new ImageButton(MAIN_MENU, Pong.SIZE.width / 2 - 175 / 2, 320, 175, 80));
 
-		manager.addButton(new ImageButton(NEW_GAME, Pong.SIZE.width / 2 - 175 / 2, 305, 175, 80));
+		manager.addButton(new ImageButton(NEW_GAME, Pong.SIZE.width / 2 - 175 / 2, 230, 175, 80));
 	}
 
 	public void update() {
@@ -71,6 +72,14 @@ public class GameState extends BasicState {
 	public void render(Graphics g) {
 		level.render(g);
 		manager.renderAll(g);
+	}
+	
+	public Level getLevel() {
+		return level;
+	}
+	
+	public void moveOpp(int dist) {
+		level.movePlayer2(dist);
 	}
 
 	public void setDifficulty(float speed) {

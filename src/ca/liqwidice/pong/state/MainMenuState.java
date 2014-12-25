@@ -33,9 +33,12 @@ public class MainMenuState extends BasicState {
 		int buttonWidth = 250;
 		manager.addButton(new ImageButton(VSAI, Pong.SIZE.width / 2 - buttonWidth / 2, 60, buttonWidth, 85));
 
-		manager.addButton(new ImageButton(EASY, Pong.SIZE.width / 2 - buttonWidth / 2, 60, 74, 85)); //74x85 with a 14px gap
-		manager.addButton(new ImageButton(MEDIUM, Pong.SIZE.width / 2 - 74 / 2, 60, 74, 85));
-		manager.addButton(new ImageButton(HARD, Pong.SIZE.width / 2 + buttonWidth / 2 - 74, 60, 74, 85));
+		manager.addButton(new ImageButton(EASY, Pong.SIZE.width / 2 - buttonWidth / 2, 60, 74, 85,
+				ImageButton.SMALL_BTN, ImageButton.SMALL_BTN_HOV)); //74x85 with a 14px gap
+		manager.addButton(new ImageButton(MEDIUM, Pong.SIZE.width / 2 - 74 / 2, 60, 74, 85, ImageButton.SMALL_BTN,
+				ImageButton.SMALL_BTN_HOV));
+		manager.addButton(new ImageButton(HARD, Pong.SIZE.width / 2 + buttonWidth / 2 - 74, 60, 74, 85,
+				ImageButton.SMALL_BTN, ImageButton.SMALL_BTN_HOV));
 		manager.getButton(EASY).setVisible(false);
 		manager.getButton(MEDIUM).setVisible(false);
 		manager.getButton(HARD).setVisible(false);
@@ -57,27 +60,31 @@ public class MainMenuState extends BasicState {
 
 		if (manager.getButton(VSAI).isClicked()) {
 			showingSP = false;
+			Pong.mouse.releaseAll();
 		} else if (!showingSP) {
 			if (manager.getButton(EASY).isClicked()) {
-				pong.getStateManager().addState(new GameState(pong, Level.getDefaultPVAILevel()));
-				((GameState) pong.getStateManager().getCurrentState()).setDifficulty(AIPaddle.EASY_SPEED);
-				((GameState) pong.getStateManager().getCurrentState()).setPaused(false);
+				pong.getStateManager().addState(new LocalGameState(pong, Level.getDefaultPVAILevel()));
+				((LocalGameState) pong.getStateManager().getCurrentState()).getGameObject().setDifficulty(
+						AIPaddle.EASY_SPEED);
+				((LocalGameState) pong.getStateManager().getCurrentState()).getGameObject().setPaused(false);
 				showingSP = true;
 			} else if (manager.getButton(MEDIUM).isClicked()) {
-				pong.getStateManager().addState(new GameState(pong, Level.getDefaultPVAILevel()));
-				((GameState) pong.getStateManager().getCurrentState()).setDifficulty(AIPaddle.MEDIUM_SPEED);
-				((GameState) pong.getStateManager().getCurrentState()).setPaused(false);
+				pong.getStateManager().addState(new LocalGameState(pong, Level.getDefaultPVAILevel()));
+				((LocalGameState) pong.getStateManager().getCurrentState()).getGameObject().setDifficulty(
+						AIPaddle.MEDIUM_SPEED);
+				((LocalGameState) pong.getStateManager().getCurrentState()).getGameObject().setPaused(false);
 				showingSP = true;
 			} else if (manager.getButton(HARD).isClicked()) {
-				pong.getStateManager().addState(new GameState(pong, Level.getDefaultPVAILevel()));
-				((GameState) pong.getStateManager().getCurrentState()).setDifficulty(AIPaddle.HARD_SPEED);
-				((GameState) pong.getStateManager().getCurrentState()).setPaused(false);
+				pong.getStateManager().addState(new LocalGameState(pong, Level.getDefaultPVAILevel()));
+				((LocalGameState) pong.getStateManager().getCurrentState()).getGameObject().setDifficulty(
+						AIPaddle.HARD_SPEED);
+				((LocalGameState) pong.getStateManager().getCurrentState()).getGameObject().setPaused(false);
 				showingSP = true;
 			}
 		}
 		if (manager.getButton(VSHUMAN).isClicked()) {
-			pong.getStateManager().addState(new GameState(pong, Level.getDefaultPVPLevel()));
-			((GameState) pong.getStateManager().getCurrentState()).setPaused(false);
+			pong.getStateManager().addState(new LocalGameState(pong, Level.getDefaultLocalPVPLevel()));
+			((LocalGameState) pong.getStateManager().getCurrentState()).getGameObject().setPaused(false);
 			showingSP = true;
 		} else if (manager.getButton(MULTIPLAYER).isClicked()) {
 			pong.getStateManager().addState(new ServerBrowserState(pong));

@@ -35,12 +35,14 @@ public class Pong extends Canvas implements Runnable {
 	private StateManager sm;
 	private Image icon = new ImageIcon("res/icon.png").getImage();
 
+	private boolean renderDebug = false;
 	private boolean running = false;
 	private int fps = 0;
 
 	public Pong() {
 		super();
 		setSize(SIZE);
+		setFocusable(true);
 
 		frame = new JFrame("Pong");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -50,6 +52,7 @@ public class Pong extends Canvas implements Runnable {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		frame.setIconImage(icon);
+		frame.setFocusable(true);
 
 		keyboard = new Keyboard(this);
 		mouse = new Mouse(this);
@@ -67,9 +70,9 @@ public class Pong extends Canvas implements Runnable {
 	}
 
 	private void update() {
-		if (Key.W.clicked && Key.CONTROL.down > -1) {
-			stop();
-		}
+		if (Key.W.clicked && Key.CONTROL.down > -1) stop();
+		if (Key.F3.clicked) renderDebug = !renderDebug;
+
 		sm.update();
 		keyboard.update();
 		mouse.update();
@@ -111,9 +114,11 @@ public class Pong extends Canvas implements Runnable {
 				frames = 0;
 			}
 
-			//g.setColor(Color.WHITE);
-			//g.setFont(new Font("Consolas", Font.BOLD, 16));
-			//g.drawString(fps + " FPS", 8, 16);
+			if (renderDebug) {
+				g.setColor(Color.WHITE);
+				g.setFont(new Font("Consolas", Font.BOLD, 16));
+				g.drawString(fps + " FPS", 8, 16);
+			}
 
 			g.dispose();
 			buffer.show();

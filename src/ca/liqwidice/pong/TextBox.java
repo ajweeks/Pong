@@ -66,7 +66,10 @@ public class TextBox {
 			}
 		}
 
-		if (!hasFocus) return;
+		if (!hasFocus) {
+			cursor = "";
+			return;
+		}
 
 		if (ticks++ > blinkRate) {
 			ticks = 0;
@@ -215,7 +218,7 @@ public class TextBox {
 		return 0;
 	}
 
-	/** also deselects all if all is already seleted */
+	/** also de-selects all if all is already selected */
 	private void selectAll() {
 		if (cursorStart == 0 && cursorEnd == text.length()) {
 			cursorStart = cursorEnd;

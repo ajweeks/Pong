@@ -9,6 +9,6 @@ public class Colour {
 	public static final Color GRAY_TEXT = new Color(145, 135, 135);
 	public static final Color SELECTED_TEXT = new Color(128, 128, 128);
 	public static final Color SELECTED_TEXT_BG = new Color(15, 15, 15);
-	public static final Color WINNER_BG = new Color(23, 123, 23);
-	public static final Color LOSER_BG = new Color(160, 30, 30);
+	public static final Color WINNER_BG = new Color(10,40,10);
+	public static final Color LOSER_BG = new Color(50,15,15);
 }

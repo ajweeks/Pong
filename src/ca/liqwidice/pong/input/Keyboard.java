@@ -17,6 +17,9 @@ public class Keyboard implements KeyListener {
 				false), NUM5("5", "%", false), NUM6("6", "^", false), NUM7("7", "&", false), NUM8("8", "*", false), NUM9(
 				"9", "(", false),
 
+		//F keys
+		F1("F1", true), F2("F2", true), F3("F3", true),
+
 		//other non-function keys
 		SPACE(" ", false), SLASH("/", "?", false), BACKSLASH("\\", "|", false), COMMA(",", "<", false), PERIOD(".",
 				">", false), GRAVE("`", "~", false), LSQUARE("[", "{", false), RSQUARE("]", "}", false), SEMICOLON(";",
@@ -149,6 +152,17 @@ public class Keyboard implements KeyListener {
 			break;
 		case KeyEvent.VK_CAPS_LOCK:
 			updateCaps(pressed);
+			break;
+
+		//F Keys
+		case KeyEvent.VK_F1:
+			Key.F1.changed(pressed);
+			break;
+		case KeyEvent.VK_F2:
+			Key.F2.changed(pressed);
+			break;
+		case KeyEvent.VK_F3:
+			Key.F3.changed(pressed);
 			break;
 
 		//others

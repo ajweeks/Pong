@@ -26,6 +26,7 @@ public class ServerBrowserState extends BasicState {
 		manager.addButton(new ImageButton(NEW_SERVER, Pong.SIZE.width / 2 - 250 / 2,
 				Pong.SIZE.height / 2 - 85 / 2 - 50, 250, 85));
 		portInput = new TextBox(Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 85 / 2 + 115, 250, 25);
+		portInput.setAcceptsNumbers(true);
 		portInput.setAcceptsLetters(false);
 		portInput.setAcceptsSpecialCharacters(false);
 		manager.addButton(new ImageButton(JOIN_SERVER, Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 85 / 2
@@ -38,11 +39,11 @@ public class ServerBrowserState extends BasicState {
 		if (manager.getButton(MAIN_MENU).isClicked() || Key.ESC.clicked) {
 			pong.getStateManager().enterPreviousState();
 		} else if (manager.getButton(NEW_SERVER).isClicked()) {
-			pong.getStateManager().addState(new ServerHostState(pong));
+			pong.getStateManager().addState(new ServerState(pong));
 		} else if (manager.getButton(JOIN_SERVER).isClicked()) {
-			pong.getStateManager().addState(new ServerJoinState(pong));
-			((ServerJoinState) pong.getStateManager().getCurrentState()).setPort("localhost",
-					Integer.parseInt(portInput.getText()));
+			if (portInput.getText() != "") {
+				pong.getStateManager().addState(new ClientState(pong, Integer.parseInt(portInput.getText())));
+			}
 		}
 
 		portInput.update();

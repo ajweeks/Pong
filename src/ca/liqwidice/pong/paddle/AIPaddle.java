@@ -5,11 +5,11 @@ import ca.liqwidice.pong.level.Ball;
 public class AIPaddle extends Paddle {
 	private static final long serialVersionUID = 1L;
 
-	public static final float EASY_SPEED = 4.0f;
-	public static final float MEDIUM_SPEED = 5.0f;
-	public static final float HARD_SPEED = 6.2f;
+	public static final short EASY_SPEED = 4;
+	public static final short MEDIUM_SPEED = 5;
+	public static final short HARD_SPEED = 6;
 
-	public AIPaddle(int x, int y, int width, int height, float speed) {
+	public AIPaddle(short x, short y, short width, short height, short speed) {
 		super(x, y, width, height);
 		this.speed = speed;
 	}
@@ -21,9 +21,9 @@ public class AIPaddle extends Paddle {
 		//TODO MAKE MORE DIFFICULT AI FOR MEDIUM AND HARD
 
 		if (ballMid > playerMid) { //ball is below paddle
-			move((int) Math.min(speed, difference));
+			moveY((short) Math.min(speed, difference));
 		} else if (ballMid < playerMid) {
-			move(-(int) Math.min(speed, difference));
+			moveY((short) -Math.min(speed, difference));
 		}
 
 		clamp();
