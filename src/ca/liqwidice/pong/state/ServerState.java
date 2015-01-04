@@ -21,7 +21,7 @@ import ca.liqwidice.pong.paddle.PlayerPaddle;
 public class ServerState extends NetworkedState {
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
-
+	
 	public ServerState(Pong pong) {
 		super(pong);
 		try {
@@ -31,7 +31,7 @@ public class ServerState extends NetworkedState {
 			terminate();
 			return;
 		}
-
+		
 		recieve = new Thread() {
 			public void run() {
 				try {
@@ -66,10 +66,10 @@ public class ServerState extends NetworkedState {
 				}
 			}
 		};
-
+		
 		recieve.start();
 	}
-
+	
 	public void render(Graphics g) {
 		if (clientSocket == null || game == null) {
 			g.setColor(Color.white);
@@ -89,23 +89,22 @@ public class ServerState extends NetworkedState {
 			game.render(g);
 		}
 	}
-
+	
 	@Override
 	public void update() {
 		if (clientSocket == null || game == null) {
 			if (Key.ESC.clicked) terminate();
 			return;
 		}
-
+		
 		game.update();
-
+		
 		//Send
 		if (clientSocket != null) {
+			//TODO send client fewer/no messages regarding the ball's pos, make them calculate it (accurately)
 			//BALL_X_POS_CHANGE
 			short ourBallX = (short) game.getLevel().getBall().getX();
-			short newBallX = (short) (Pong.SIZE.width - ourBallX);
-			//Our Ball's x pos is on the wrong side of the screen for the client 
-			//TODO make client play on right side of screen?
+			short newBallX = (short) (Pong.SIZE.width - ourBallX); //Our Ball's x pos is on the wrong side of the screen for the client 
 			if (lastBallX != newBallX) {
 				sendMessage(BALL_X_POS_CHANGE, newBallX);
 				lastBallX = newBallX;
@@ -149,7 +148,7 @@ public class ServerState extends NetworkedState {
 			}
 		}
 	}
-
+	
 	private void sendMessage(byte type, short content) {
 		ByteBuffer buffer = ByteBuffer.allocate(3);
 		buffer.put(0, type);
@@ -162,7 +161,7 @@ public class ServerState extends NetworkedState {
 			terminate();
 		}
 	}
-
+	
 	private void terminate() {
 		//TODO make threads die after either the client or server quits a game
 		pong.getStateManager().enterPreviousState();

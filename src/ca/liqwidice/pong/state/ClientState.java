@@ -16,9 +16,9 @@ import ca.liqwidice.pong.paddle.PlayerPaddle;
 
 /** Does nothing but poll for this user's input and send that to Server */
 public class ClientState extends NetworkedState {
-
+	
 	private Socket socket;
-
+	
 	public ClientState(Pong pong, String hostName, int port) {
 		super(pong);
 		try {
@@ -28,7 +28,7 @@ public class ClientState extends NetworkedState {
 			pong.getStateManager().enterPreviousState();
 			return;
 		}
-
+		
 		recieve = new Thread() {
 			public void run() {
 				try {
@@ -83,10 +83,10 @@ public class ClientState extends NetworkedState {
 				}
 			}
 		};
-
+		
 		recieve.start();
 	}
-
+	
 	public void render(Graphics g) {
 		if (socket == null) {
 			g.setColor(Color.WHITE);
@@ -102,16 +102,16 @@ public class ClientState extends NetworkedState {
 			game.render(g);
 		}
 	}
-
+	
 	@Override
 	public void update() {
 		if (socket == null || game == null) {
 			if (Key.ESC.clicked) pong.getStateManager().enterPreviousState();
 			return;
 		}
-
+		
 		game.update();
-
+		
 		//Send
 		try {
 			if (socket != null) {
@@ -123,7 +123,7 @@ public class ClientState extends NetworkedState {
 					buffer.putShort(ourNewY);
 					byte[] msg = buffer.array();
 					socket.getOutputStream().write(msg);
-
+					
 					ourLastY = ourNewY;
 				}
 				//PAUSE
@@ -135,7 +135,7 @@ public class ClientState extends NetworkedState {
 					else buffer.put(2, (byte) 0);
 					byte[] msg = buffer.array();
 					socket.getOutputStream().write(msg);
-
+					
 					wasPaused = isPaused; //Equivalent to wasPaused = !wasPaused;
 				}
 			}
