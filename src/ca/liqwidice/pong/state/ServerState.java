@@ -25,7 +25,7 @@ public class ServerState extends NetworkedState {
 	public ServerState(Pong pong) {
 		super(pong);
 		try {
-			serverSocket = new ServerSocket(0, 1, InetAddress.getLocalHost());
+			serverSocket = new ServerSocket(0);
 		} catch (IOException e) {
 			System.err.println("A server is already running on this port!!!");
 			terminate();
@@ -40,7 +40,6 @@ public class ServerState extends NetworkedState {
 					//byte seed = (byte) (Math.random() * 127);
 					//System.out.println("server choose the seed: " + seed);
 					//clientSocket.getOutputStream().write(seed);
-
 					byte seed = 15;
 					game = new GameObject(pong, new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, true, true, true),
 							new PlayerPaddle(Paddle.DEFAULT_X_2, false, false, false), seed, Ball.newBall(false, seed)));
@@ -76,12 +75,11 @@ public class ServerState extends NetworkedState {
 			g.setColor(Color.white);
 			g.setFont(Pong.font32);
 			if (serverSocket != null) {
-				g.drawString("Waiting for someone to join at ", 25, Pong.SIZE.height / 2 + 10);
+				g.drawString("Waiting for someone to join at ", 5, Pong.SIZE.height / 2 + 10);
 				try {
-					g.drawString("host name: " + ("" + InetAddress.getLocalHost()).split("/")[0] + ", port: "
-							+ serverSocket.getLocalPort(), 25, Pong.SIZE.height / 2 + 40);
+					g.drawString("host name: " + ("" + InetAddress.getLocalHost()).split("/")[0], 5, Pong.SIZE.height / 2 + 40);
+					g.drawString("port: " + serverSocket.getLocalPort(), 5, Pong.SIZE.height / 2 + 70);
 				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else {

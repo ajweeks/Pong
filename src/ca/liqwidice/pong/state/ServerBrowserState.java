@@ -36,7 +36,7 @@ public class ServerBrowserState extends BasicState {
 		hostInput = new TextBox(Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 155 / 2 + 115, 250, 25);
 		hostInput.setAcceptsLetters(true);
 		hostInput.setAcceptsSpecialCharacters(true);
-		hostInput.setAcceptsNumbers(false);
+		hostInput.setAcceptsNumbers(true);
 		hostInput.setPromptText("      host name   ");
 	}
 
