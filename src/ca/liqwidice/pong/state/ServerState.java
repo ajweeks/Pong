@@ -3,8 +3,10 @@ package ca.liqwidice.pong.state;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
 import ca.liqwidice.pong.Pong;
@@ -23,10 +25,10 @@ public class ServerState extends NetworkedState {
 	public ServerState(Pong pong) {
 		super(pong);
 		try {
-			serverSocket = new ServerSocket(63400);
+			serverSocket = new ServerSocket(0, 1, InetAddress.getLocalHost());
 		} catch (IOException e) {
 			System.err.println("A server is already running on this port!!!");
-			pong.getStateManager().enterPreviousState();
+			terminate();
 			return;
 		}
 
@@ -74,8 +76,14 @@ public class ServerState extends NetworkedState {
 			g.setColor(Color.white);
 			g.setFont(Pong.font32);
 			if (serverSocket != null) {
-				g.drawString("Waiting for someone to join at " + serverSocket.getLocalPort(), 25,
-						Pong.SIZE.height / 2 + 10);
+				g.drawString("Waiting for someone to join at ", 25, Pong.SIZE.height / 2 + 10);
+				try {
+					g.drawString("host name: " + ("" + InetAddress.getLocalHost()).split("/")[0] + ", port: "
+							+ serverSocket.getLocalPort(), 25, Pong.SIZE.height / 2 + 40);
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} else {
 				g.drawString("Port in use, Press esc", 150, 230);
 			}
@@ -87,7 +95,7 @@ public class ServerState extends NetworkedState {
 	@Override
 	public void update() {
 		if (clientSocket == null || game == null) {
-			if (Key.ESC.clicked) pong.getStateManager().enterPreviousState();
+			if (Key.ESC.clicked) terminate();
 			return;
 		}
 
@@ -153,7 +161,12 @@ public class ServerState extends NetworkedState {
 			clientSocket.getOutputStream().write(msg);
 		} catch (IOException e) {
 			System.out.println("client disconnected! :(");
-			pong.getStateManager().enterPreviousState();
+			terminate();
 		}
+	}
+
+	private void terminate() {
+		//TODO make threads die after either the client or server quits a game
+		pong.getStateManager().enterPreviousState();
 	}
 }

@@ -19,12 +19,14 @@ public class ClientState extends NetworkedState {
 
 	private Socket socket;
 
-	public ClientState(Pong pong, int port) {
+	public ClientState(Pong pong, String hostName, int port) {
 		super(pong);
 		try {
-			socket = new Socket("localhost", 63400);
+			socket = new Socket(hostName, port);
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("connection refused!");
+			pong.getStateManager().enterPreviousState();
+			return;
 		}
 
 		recieve = new Thread() {
@@ -38,7 +40,7 @@ public class ClientState extends NetworkedState {
 					//buffer.put(seedByte);
 					//byte seed = buffer.get();
 					//System.out.println("client received the seed: " + seed);
-					byte seed = 15; //TODO use an actual seed
+					byte seed = 15; //LATER use an actual seed
 					game = new GameObject(pong, new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, true, true, true),
 							new PlayerPaddle(Paddle.DEFAULT_X_2, false, false, false), seed, Ball.newBall(true, seed)));
 					game.getLevel().updateBall = false;
@@ -86,6 +88,12 @@ public class ClientState extends NetworkedState {
 	}
 
 	public void render(Graphics g) {
+		if (socket == null) {
+			g.setColor(Color.WHITE);
+			g.setFont(Pong.font32);
+			g.drawString("connection refused, press esc", 20, 200);
+			return;
+		}
 		if (!socket.isConnected() || game == null) {
 			g.setColor(Color.WHITE);
 			g.setFont(Pong.font32);

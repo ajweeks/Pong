@@ -16,6 +16,7 @@ public class ServerBrowserState extends BasicState {
 
 	private ButtonManager manager;
 	private TextBox portInput;
+	private TextBox hostInput;
 
 	public ServerBrowserState(Pong pong) {
 		super(pong);
@@ -23,13 +24,20 @@ public class ServerBrowserState extends BasicState {
 		manager.addButton(new ImageButton(MAIN_MENU, 15, 15, 250, 85));
 		manager.addButton(new ImageButton(NEW_SERVER, Pong.SIZE.width / 2 - 250 / 2,
 				Pong.SIZE.height / 2 - 85 / 2 - 50, 250, 85));
+		manager.addButton(new ImageButton(JOIN_SERVER, Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 85 / 2
+				+ 150, 250, 85));
+
 		portInput = new TextBox(Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 85 / 2 + 115, 250, 25);
 		portInput.setAcceptsNumbers(true);
 		portInput.setAcceptsLetters(false);
 		portInput.setAcceptsSpecialCharacters(false);
-		portInput.setPromptText("    port number (1-63885)");
-		manager.addButton(new ImageButton(JOIN_SERVER, Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 85 / 2
-				+ 150, 250, 85));
+		portInput.setPromptText("    port number (0-65535)");
+
+		hostInput = new TextBox(Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 155 / 2 + 115, 250, 25);
+		hostInput.setAcceptsLetters(true);
+		hostInput.setAcceptsSpecialCharacters(true);
+		hostInput.setAcceptsNumbers(false);
+		hostInput.setPromptText("      host name   ");
 	}
 
 	public void update() {
@@ -41,7 +49,8 @@ public class ServerBrowserState extends BasicState {
 			pong.getStateManager().addState(new ServerState(pong));
 		} else if (manager.getButton(JOIN_SERVER).isClicked()) {
 			try {
-				pong.getStateManager().addState(new ClientState(pong, Integer.parseInt(portInput.getText())));
+				pong.getStateManager().addState(
+						new ClientState(pong, hostInput.getText(), Integer.parseInt(portInput.getText())));
 			} catch (NumberFormatException e) {
 				System.out.println("Invalid port!");
 				portInput.clear();
@@ -49,14 +58,12 @@ public class ServerBrowserState extends BasicState {
 		}
 
 		portInput.update();
+		hostInput.update();
 	}
 
 	public void render(Graphics g) {
 		manager.renderAll(g);
 		portInput.render(g);
-	}
-
-	public void clearPort() {
-		portInput.clear();
+		hostInput.render(g);
 	}
 }

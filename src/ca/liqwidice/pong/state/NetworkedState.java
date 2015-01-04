@@ -11,7 +11,6 @@ public abstract class NetworkedState extends BasicState {
 	public static final byte PLAYER_1_SCORE_CHANGE = 0b0100; //4
 	public static final byte PLAYER_2_SCORE_CHANGE = 0b0101; //5
 	public static final byte RESET_GAME = 0b0110; //6 - USED AFTER A GAME HAS FINSISHED
-	//LATER add ball start message (after someone has scored, wait for them to click before sending ball off again)
 
 	//Messages are 3 bytes long:
 	//First byte = message type
