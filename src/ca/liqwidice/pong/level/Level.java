@@ -5,15 +5,12 @@ import java.awt.Graphics;
 
 import ca.liqwidice.pong.Colour;
 import ca.liqwidice.pong.Pong;
-import ca.liqwidice.pong.input.Keyboard.Key;
 import ca.liqwidice.pong.paddle.AIPaddle;
 import ca.liqwidice.pong.paddle.Paddle;
 import ca.liqwidice.pong.paddle.PlayerPaddle;
 import ca.liqwidice.pong.sound.Sound;
 
 public class Level {
-
-	public static final float BALL_XV = 9.0f;
 
 	public static final int WINNING_SCORE = 11;
 
@@ -23,29 +20,34 @@ public class Level {
 
 	private int ticks = 0;
 	private boolean paused = false;
-	private int player1Score = 0, player2Score = 0;
+	private short player1Score = 0, player2Score = 0;
 	private boolean gameOver = false;
+	private boolean wasReset = false;
 
 	/** @param player1 is the paddle on the left, 
 	 *  @param player2 is the paddle on the right */
-	public Level(Paddle player1, Paddle player2) {
-		ball = Ball.newBall(this, false);
+	public Level(Paddle player1, Paddle player2, byte seed, Ball ball) {
 		this.player1 = player1;
 		this.player2 = player2;
+		this.ball = ball;
 	}
+
+	/** @param player1 is the paddle on the left, 
+	 *  @param player2 is the paddle on the right */
+	public Level(Paddle player1, Paddle player2, byte seed) {
+		this(player1, player2, seed, Ball.newBall(false));
+	}
+
+	public boolean updateBall = true;
 
 	public void update() {
 		ticks++;
-		if (paused) return;
+		if (player1Score >= WINNING_SCORE || player2Score >= WINNING_SCORE) gameOver = true;
+		if (paused || gameOver) return;
 
-		if (player1Score >= WINNING_SCORE || player2Score >= WINNING_SCORE) {
-			gameOver = true;
-		}
-		if (gameOver) return;
-
+		if (updateBall) ball.update();
 		player1.update(ball);
 		player2.update(ball);
-		ball.update();
 		if (ball.isOffScreen()) {
 			resetBall();
 		}
@@ -58,7 +60,7 @@ public class Level {
 			float angle = ((player1.y + (player1.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
 			ball.x = player1.x + player1.width;
 			ball.setXv(-ball.getXv());
-			ball.setYv(-angle * Level.BALL_XV);
+			ball.setYv(-angle * ball.getXv());
 			Sound.boop.play();
 		}
 
@@ -70,20 +72,20 @@ public class Level {
 			float angle = ((player2.y + (player2.height / 2)) - (ball.y + (ball.height / 2))) / halfHeight;
 			ball.x = player2.x - ball.width;
 			ball.setXv(-ball.getXv());
-			ball.setYv(-angle);
+			ball.setYv(angle * ball.getXv());
 			Sound.boop.play();
 		}
 	}
 
 	public void resetBall() {
-		if (ball.x - ball.width < 0) {
+		if (ball.x <= 0) {
 			player2Score++;
 			Sound.lose.play();
-			ball = Ball.newBall(this, false);
-		} else if (ball.x > Pong.SIZE.width) {
+			ball.reset(false);
+		} else if (ball.x + ball.width >= Pong.SIZE.width) {
 			player1Score++;
 			Sound.win.play();
-			ball = Ball.newBall(this, true);
+			ball.reset(true);
 		} else {
 			System.err.println("no one scored!!");
 			return;
@@ -91,6 +93,7 @@ public class Level {
 	}
 
 	public void resetGame() {
+		wasReset = true;
 		gameOver = false;
 		player1Score = 0;
 		player1.reset();
@@ -99,10 +102,6 @@ public class Level {
 	}
 
 	public void render(Graphics g) {
-		if (Key.ESC.clicked) {
-			resetGame();
-			return;
-		}
 		if (gameOver) {
 			g.setFont(Pong.font32);
 			if (player2Score >= WINNING_SCORE) {
@@ -153,6 +152,40 @@ public class Level {
 		}
 	}
 
+	public boolean wasReset() {
+		return wasReset;
+	}
+
+	public void setWasReset(boolean wasReset) {
+		this.wasReset = wasReset;
+	}
+	
+	public void setDifficulty(float speed) {
+		if (player2 instanceof AIPaddle) {
+			((AIPaddle) player2).setSpeed(speed);
+		} else System.err.println("player2 isn't an ai! You can't change it's difficulty");
+	}
+
+	public static Level getDefaultPVAILevel() {
+		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, true, true, true), new AIPaddle(Paddle.DEFAULT_X_2,
+				AIPaddle.MEDIUM_SPEED), (byte) -1);
+	}
+
+	public static Level getDefaultLocalPVPLevel() {
+		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, false, true, false), new PlayerPaddle(Paddle.DEFAULT_X_2,
+				false, false, true), (byte) -1);
+	}
+
+	public static Level getDefaultNetworkPVPLevel(byte seed) {
+		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, true, true, true), new PlayerPaddle(Paddle.DEFAULT_X_2,
+				false, false, false), seed);
+	}
+
+	public static Level getDefaultAIVAILevel() {
+		return new Level(new AIPaddle(Paddle.DEFAULT_X_1, AIPaddle.HARD_SPEED), new AIPaddle(Paddle.DEFAULT_X_2,
+				AIPaddle.HARD_SPEED), (byte) -1);
+	}
+
 	public Paddle getPlayer1() {
 		return player1;
 	}
@@ -161,66 +194,24 @@ public class Level {
 		return player2;
 	}
 
-	public void movePlayer1(int newY) {
-		player1.y = newY;
+	public short getPlayer1Score() {
+		return player1Score;
 	}
 
-	public void movePlayer2(int newY) {
-		player2.y = newY;
+	public short getPlayer2Score() {
+		return player2Score;
 	}
 
-	public void setDifficulty(float speed) {
-		if (player2 instanceof AIPaddle) {
-			((AIPaddle) player2).setSpeed(speed);
-		} else System.err.println("player2 isn't an ai! You can't change it's difficulty");
+	public void setPlayer1Score(short player1Score) {
+		this.player1Score = player1Score;
 	}
 
-	public static Level getDefaultPVAILevel() {
-		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, true,
-				true, true), new AIPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT,
-				AIPaddle.MEDIUM_SPEED));
+	public void setPlayer2Score(short player2Score) {
+		this.player2Score = player2Score;
 	}
 
-	public static Level getDefaultLocalPVPLevel() {
-		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, false,
-				true, false), new PlayerPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT,
-				false, false, true));
-	}
-
-	public static Level getDefaultNetworkPVPLevel() {
-		return new Level(new PlayerPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, true,
-				true, true), new PlayerPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT, false,
-				false, false));
-	}
-
-	public static Level getDefaultAIVAILevel() {
-		return new Level(new AIPaddle(Paddle.DEFAULT_X_1, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT,
-				AIPaddle.HARD_SPEED), new AIPaddle(Paddle.DEFAULT_X_2, Paddle.DEFAULT_Y, Paddle.WIDTH, Paddle.HEIGHT,
-				AIPaddle.HARD_SPEED));
-	}
-
-	public int getPlayer1X() {
-		return player1.x;
-	}
-
-	public int getPlayer1Y() {
-		return player1.y;
-	}
-
-	public int getPlayer2X() {
-		return player2.x;
-	}
-
-	public int getPlayer2Y() {
-		return player2.y;
-	}
-
-	public int getBallX() {
-		return ball.x;
-	}
-
-	public int getBallY() {
-		return ball.y;
+	public Ball getBall() {
+		return ball;
 	}
 
 	public boolean isGameOver() {

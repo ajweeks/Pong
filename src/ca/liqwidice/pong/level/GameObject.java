@@ -7,18 +7,17 @@ import ca.liqwidice.pong.button.ButtonManager;
 import ca.liqwidice.pong.button.ImageButton;
 import ca.liqwidice.pong.input.Keyboard.Key;
 import ca.liqwidice.pong.input.Mouse;
-import ca.liqwidice.pong.state.BasicState;
 
-/** Single player game state */
-public class GameObject extends BasicState {
+/** Holds a level object and also has buttons to navigate */
+public class GameObject {
 
 	private static final String RESUME = "RESUME";
 	private static final String MAIN_MENU = "MAIN MENU";
 	private static final String NEW_GAME = "NEW GAME";
 
+	private Pong pong;
 	private Level level;
 	private ButtonManager manager;
-	private Pong pong;
 
 	public GameObject(Pong pong, Level level) {
 		//TODO let players select which input method they want to use (using radio buttons?)
@@ -34,8 +33,9 @@ public class GameObject extends BasicState {
 
 	public void update() {
 		if (Key.ESC.clicked) level.setPaused(!level.isPaused());
-		if (Mouse.isStill() && !level.isGameOver() && !level.isPaused()) pong.setCursor(Pong.blankCursor);
-		else pong.setCursor(null);
+		if (Mouse.isStill() && !level.isGameOver() && !level.isPaused()) {
+			pong.setCursor(Pong.blankCursor);
+		} else pong.setCursor(null);
 
 		manager.updateAll();
 
@@ -73,13 +73,9 @@ public class GameObject extends BasicState {
 		level.render(g);
 		manager.renderAll(g);
 	}
-	
+
 	public Level getLevel() {
 		return level;
-	}
-	
-	public void moveOpp(int dist) {
-		level.movePlayer2(dist);
 	}
 
 	public void setDifficulty(float speed) {

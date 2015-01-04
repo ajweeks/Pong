@@ -31,11 +31,12 @@ public class Pong extends Canvas implements Runnable {
 	public static Font font16 = font32.deriveFont(16.0f);
 	public static Cursor blankCursor;
 
+	public static boolean renderDebug = false;
+	
 	private JFrame frame;
 	private StateManager sm;
 	private Image icon = new ImageIcon("res/icon.png").getImage();
 
-	private boolean renderDebug = false;
 	private boolean running = false;
 	private int fps = 0;
 
@@ -57,7 +58,7 @@ public class Pong extends Canvas implements Runnable {
 		keyboard = new Keyboard(this);
 		mouse = new Mouse(this);
 
-		sm = new StateManager(new MainMenuState(this));
+		sm = new StateManager(this, new MainMenuState(this));
 
 		blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
 				new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "blank cursor");
@@ -93,11 +94,13 @@ public class Pong extends Canvas implements Runnable {
 		int frames = 0;
 		while (running) {
 			long now = System.nanoTime();
-			elapsed += now - before;
+			long delta = now - before;
+			elapsed += delta;
 			before = now;
 
+			long NS_PER_TICK = 1_000_000_000 / 60;
+
 			update();
-			frames++;
 
 			BufferStrategy buffer = getBufferStrategy();
 			if (buffer == null) {
@@ -107,12 +110,7 @@ public class Pong extends Canvas implements Runnable {
 			Graphics g = buffer.getDrawGraphics();
 
 			render(g);
-
-			if (elapsed > 1_000_000_000) {
-				elapsed = 0;
-				fps = frames;
-				frames = 0;
-			}
+			frames++;
 
 			if (renderDebug) {
 				g.setColor(Color.WHITE);
@@ -120,11 +118,18 @@ public class Pong extends Canvas implements Runnable {
 				g.drawString(fps + " FPS", 8, 16);
 			}
 
+			if (elapsed > 1_000_000_000) {
+				elapsed = 0;
+				fps = frames;
+				frames = 0;
+			}
+
 			g.dispose();
 			buffer.show();
 
 			try {
-				Thread.sleep(15); //TODO implement an actual game loop
+				long s = Math.max(0, (NS_PER_TICK - delta) / 1_000_000);
+				Thread.sleep(s);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

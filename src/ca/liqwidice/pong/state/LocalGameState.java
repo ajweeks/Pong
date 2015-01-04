@@ -11,6 +11,7 @@ public class LocalGameState extends BasicState {
 	private GameObject game;
 
 	public LocalGameState(Pong pong, Level level) {
+		super(pong);
 		game = new GameObject(pong, level);
 	}
 

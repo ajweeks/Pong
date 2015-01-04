@@ -14,9 +14,10 @@ public class TextBox {
 
 	private int x, y, width, height;
 	private Font font;
-	private Color backgroundColour, selectionBackgroundColour, textColour, selectedTextColour;
+	private Color backgroundColour, selectedBackgroundColour, textColour, selectedTextColour, promptTextColour;
 	private boolean hasFocus = false;
 	private String text = "";
+	private String promptText = "";
 	private String clipboard = "";
 
 	private int delay = 0; //how many ticks to wait after a key has been held down before printing that key repeatedly
@@ -31,23 +32,25 @@ public class TextBox {
 	private boolean acceptsSpecialCharacters = true;
 
 	public TextBox(int x, int y, int width, int height, Font font, Color backgroundColor,
-			Color selectionBackgroundColour, Color fontColor, Color selectionColour, int blinkRate, int delay) {
+			Color selectionBackgroundColour, Color fontColor, Color selectionColour, Color promptTextColour,
+			int blinkRate, int delay) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 		this.font = font;
 		this.backgroundColour = backgroundColor;
-		this.selectionBackgroundColour = selectionBackgroundColour;
+		this.selectedBackgroundColour = selectionBackgroundColour;
 		this.textColour = fontColor;
 		this.selectedTextColour = selectionColour;
+		this.promptTextColour = promptTextColour;
 		this.blinkRate = blinkRate;
 		this.delay = delay;
 	}
 
 	public TextBox(int x, int y, int width, int height) {
 		this(x, y, width, height, Pong.font16, Color.WHITE, Colour.SELECTED_TEXT_BG, Color.BLACK, Colour.SELECTED_TEXT,
-				DEFAULT_BLINK_RATE, DEFAULT_DELAY);
+				Colour.PROMPT_TEXT, DEFAULT_BLINK_RATE, DEFAULT_DELAY);
 	}
 
 	private void turnCursorOn() {
@@ -81,6 +84,7 @@ public class TextBox {
 				if (cursor.equals("")) cursor = "|";
 				else cursor = "";
 			}
+			//turnCursorOn();
 		}
 
 		if (Key.BACKSPACE.down > delay) backspace();
@@ -181,25 +185,52 @@ public class TextBox {
 		g.fillRect(x, y, width, height);
 
 		full = false;
-		while (g.getFontMetrics().stringWidth(text + g.getFontMetrics().getMaxAdvance()) > width) {
+		while (g.getFontMetrics().stringWidth(text + g.getFontMetrics().getMaxAdvance()) > width) { //make sure the text isn't bigger than the text box
 			full = true;
 			text = text.substring(0, text.length() - 1);
 		}
 
+		while (g.getFontMetrics().stringWidth(promptText + g.getFontMetrics().getMaxAdvance()) > width) { //make sure the prompt text isn't bigger than the text box
+			promptText = promptText.substring(0, promptText.length() - 1);
+		}
+
 		//LATER add mouse cursor selection
+
+		if (text.length() > 0) drawText(g, text, textColour);
+		else drawText(g, promptText, promptTextColour);
+	}
+
+	private void drawText(Graphics g, String text, Color color) {
 		int xo = 0;
 
 		for (int i = 0; i < text.length(); i++) {
 			if (cursorEnd == cursorStart && cursorEnd == i && hasFocus) { //nothing is selected
-				g.setColor(textColour);
+				g.setColor(color);
 				g.drawString(cursor, x + xo - 4, y + 16);
 			}
-			xo += drawChar(i, x + xo, y + 16, g);
+			xo += drawChar(i, x + xo, y + 16, g, text, color);
 		}
-		if (cursorEnd == text.length() && cursorStart == cursorEnd && hasFocus) {
-			g.setColor(textColour);
+		if (cursorEnd == text.length() && cursorStart == cursorEnd && hasFocus) { //if the cursor is at the end of the string, it won't get drawn above
+			g.setColor(color);
 			g.drawString(cursor, x + xo - 4, y + 16);
 		}
+	}
+
+	/** Draws the character at index in this.text at specified pos
+	 *  Returns the width of this character */
+	private int drawChar(int index, int x, int y, Graphics g, String text, Color color) {
+		String s = String.valueOf(text.charAt(index));
+		int w = g.getFontMetrics().stringWidth(s);
+		if (hasFocus
+				&& ((cursorStart < cursorEnd && index >= cursorStart && index < cursorEnd) || (cursorStart > cursorEnd
+						&& index < cursorStart && index >= cursorEnd))) { //this character is selected
+			g.setColor(selectedBackgroundColour);
+			g.fillRect(x, y - 16, w, height); //highlight it
+
+			g.setColor(selectedTextColour);
+		} else g.setColor(color);
+		g.drawString(s, x, y);
+		return w;
 	}
 
 	/** @return the next space character to the right of the current index position in the text OR the length of the text if there are no spaces to the right */
@@ -218,7 +249,7 @@ public class TextBox {
 		return 0;
 	}
 
-	/** also de-selects all if all is already selected */
+	/** also selects none if all is already selected */
 	private void selectAll() {
 		if (cursorStart == 0 && cursorEnd == text.length()) {
 			cursorStart = cursorEnd;
@@ -372,7 +403,9 @@ public class TextBox {
 			}
 		}
 		if (Keyboard.insert) {
-			text = text.substring(0, cursorStart) + s + text.substring(cursorEnd + 1);
+			if (cursorEnd + 1 <= text.length()) {
+				text = text.substring(0, cursorStart) + s + text.substring(cursorEnd + 1);
+			}
 		} else {
 			text = text.substring(0, cursorStart) + s + text.substring(cursorEnd);
 		}
@@ -387,18 +420,8 @@ public class TextBox {
 		return text;
 	}
 
-	private int drawChar(int index, int x, int y, Graphics g) {
-		int w = g.getFontMetrics().stringWidth(String.valueOf(text.charAt(index)));
-		if (hasFocus
-				&& ((cursorStart < cursorEnd && index >= cursorStart && index < cursorEnd) || (cursorStart > cursorEnd
-						&& index < cursorStart && index >= cursorEnd))) { //this character is selected
-			g.setColor(selectionBackgroundColour);
-			g.fillRect(x, y - 16, w, height); //highlight it
-
-			g.setColor(selectedTextColour);
-		} else g.setColor(textColour);
-		g.drawString(String.valueOf(text.charAt(index)), x, y);
-		return w;
+	public void setPromptText(String text) {
+		this.promptText = text;
 	}
 
 	public void setAcceptsLetters(boolean acceptsLetters) {

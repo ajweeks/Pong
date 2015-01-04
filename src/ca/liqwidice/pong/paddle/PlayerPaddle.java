@@ -8,7 +8,7 @@ import ca.liqwidice.pong.level.Ball;
 public class PlayerPaddle extends Paddle {
 	private static final long serialVersionUID = 1L;
 
-	public static final short SPEED = 8;
+	public static final short SPEED = 6;
 
 	private boolean usesMouse, usesWASD, usesArrows;
 
@@ -19,6 +19,10 @@ public class PlayerPaddle extends Paddle {
 		this.usesWASD = usesWASD;
 		this.usesArrows = usesArrows;
 		this.speed = SPEED;
+	}
+
+	public PlayerPaddle(short x, boolean usesMouse, boolean usesWASD, boolean usesArrows) {
+		this(x, DEFAULT_Y, WIDTH, HEIGHT, usesMouse, usesWASD, usesArrows);
 	}
 
 	@Override
@@ -33,6 +37,8 @@ public class PlayerPaddle extends Paddle {
 		clamp();
 	}
 
+	/** Applies WASD keys to player pos if any were pressed
+	 *  Returns True if any WASD keys have been pressed (currently A and D are not used) */
 	private boolean useWASD() {
 		if (Key.W.down != -1) {
 			y -= SPEED;
@@ -43,6 +49,8 @@ public class PlayerPaddle extends Paddle {
 		} else return false;
 	}
 
+	/** Applies Arrow keys to paddle pos if any were pressed
+	 *  Returns True if any Arrow keys have been pressed (currently LEFT and RIGHT are not used)  */
 	private boolean useArrows() {
 		if (Key.UP.down != -1) {
 			y -= SPEED;
@@ -52,13 +60,15 @@ public class PlayerPaddle extends Paddle {
 			return true;
 		} else return false;
 	}
-
+	
+	/** Moves paddle towards mouse
+	 *  Returns True if paddle was moved towards mouse (False if they were already at same pos) */
 	private void useMouse() {
 		short midpoint = (short) (y + height / 2);
 		short dist = (short) Math.min(SPEED, Math.abs(Pong.mouse.getY() - midpoint));
 
 		if (Pong.mouse.getY() < midpoint) { //mouse is above paddle's midpoint
-			moveY((short) -dist); //raise paddle (For some reason you need to cast a negative short... Look at LATER
+			moveY((short) -dist); //raise paddle
 		} else if (Pong.mouse.getY() > midpoint) { //mouse is below paddle's midpoint
 			moveY(dist); //lower paddle
 		}

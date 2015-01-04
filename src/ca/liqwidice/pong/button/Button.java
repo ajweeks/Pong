@@ -44,8 +44,8 @@ public class Button {
 			hover = true;
 			if (down) clicked = false;
 			else if (Pong.mouse.isLeftDown()) {
-				Sound.click.play();
 				clicked = true;
+				Sound.click.play();
 			}
 			down = Pong.mouse.isLeftDown();
 			return;

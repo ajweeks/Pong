@@ -15,12 +15,10 @@ public class ServerBrowserState extends BasicState {
 	public static final String JOIN_SERVER = "JOIN SERVER";
 
 	private ButtonManager manager;
-	private Pong pong;
-
 	private TextBox portInput;
 
 	public ServerBrowserState(Pong pong) {
-		this.pong = pong;
+		super(pong);
 		manager = new ButtonManager();
 		manager.addButton(new ImageButton(MAIN_MENU, 15, 15, 250, 85));
 		manager.addButton(new ImageButton(NEW_SERVER, Pong.SIZE.width / 2 - 250 / 2,
@@ -29,6 +27,7 @@ public class ServerBrowserState extends BasicState {
 		portInput.setAcceptsNumbers(true);
 		portInput.setAcceptsLetters(false);
 		portInput.setAcceptsSpecialCharacters(false);
+		portInput.setPromptText("    port number (1-63885)");
 		manager.addButton(new ImageButton(JOIN_SERVER, Pong.SIZE.width / 2 - 250 / 2, Pong.SIZE.height / 2 - 85 / 2
 				+ 150, 250, 85));
 	}
@@ -41,8 +40,11 @@ public class ServerBrowserState extends BasicState {
 		} else if (manager.getButton(NEW_SERVER).isClicked()) {
 			pong.getStateManager().addState(new ServerState(pong));
 		} else if (manager.getButton(JOIN_SERVER).isClicked()) {
-			if (portInput.getText() != "") {
+			try {
 				pong.getStateManager().addState(new ClientState(pong, Integer.parseInt(portInput.getText())));
+			} catch (NumberFormatException e) {
+				System.out.println("Invalid port!");
+				portInput.clear();
 			}
 		}
 

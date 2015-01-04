@@ -68,7 +68,7 @@ public class Keyboard implements KeyListener {
 		}
 	}
 
-	//LATER add key mapping
+	//LATER add custom key mapping
 
 	public static boolean capsLock = false;
 	private static boolean capsChanged = false;

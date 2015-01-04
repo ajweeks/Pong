@@ -9,7 +9,10 @@ public class StateManager {
 
 	private Vector<BasicState> states = new Vector<>(); //A stack of all the current states, with the current state being the last element
 
-	public StateManager(BasicState firstState) {
+	private Pong pong;
+	
+	public StateManager(Pong pong, BasicState firstState) {
+		this.pong = pong;
 		states.add(firstState);
 	}
 
@@ -22,22 +25,20 @@ public class StateManager {
 	}
 
 	public void enterPreviousState() {
-		if (states.size() > 1) states.remove(states.lastElement());
-		Pong.mouse.releaseAll();
+		if (states.size() > 1) {
+			states.remove(states.lastElement());
+			Pong.mouse.releaseAll();
+		}
 	}
 
 	public BasicState getCurrentState() {
 		return states.lastElement();
 	}
 
+	/** Adds BasicState state to the stack, and enters it */
 	public void addState(BasicState state) {
 		states.add(state);
 		Pong.mouse.releaseAll();
+		pong.setCursor(null);
 	}
-
-	//	public void enterState(int stateID) {
-	//		Pong.keyboard.releaseAll();
-	//		Pong.mouse.releaseAll();
-	//		states.add(states.get(stateID));
-	//	}
 }

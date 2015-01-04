@@ -10,10 +10,10 @@ import ca.liqwidice.pong.level.Ball;
 public abstract class Paddle extends Rectangle {
 	private static final long serialVersionUID = 1L;
 
-	public static final short WIDTH = 25;
-	public static final short HEIGHT = 100;
+	public static final short WIDTH = 18;
+	public static final short HEIGHT = 60;
 	public static final short DEFAULT_X_1 = 50;
-	public static final short DEFAULT_X_2 = (short) (Pong.SIZE.width - 75);
+	public static final short DEFAULT_X_2 = (short) (Pong.SIZE.width - DEFAULT_X_1 - WIDTH);
 	public static final short DEFAULT_Y = (short) (Pong.SIZE.height / 2 - HEIGHT / 2);
 
 	protected float speed;
@@ -29,7 +29,7 @@ public abstract class Paddle extends Rectangle {
 
 	public abstract void update(Ball ball);
 
-	public void render(Graphics g) { //abstract
+	public void render(Graphics g) {
 		g.setColor(Color.WHITE);
 		g.fillRect(x, y, width, height);
 	}
@@ -49,5 +49,13 @@ public abstract class Paddle extends Rectangle {
 
 	public void setSpeed(float speed) {
 		this.speed = speed;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public void setY(int y) {
+		this.y = y;
 	}
 }

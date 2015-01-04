@@ -8,6 +8,7 @@ import ca.liqwidice.pong.button.ButtonManager;
 import ca.liqwidice.pong.button.ImageButton;
 import ca.liqwidice.pong.level.Level;
 import ca.liqwidice.pong.paddle.AIPaddle;
+import ca.liqwidice.pong.paddle.Paddle;
 import ca.liqwidice.pong.sound.Sound;
 
 public class MainMenuState extends BasicState {
@@ -22,13 +23,12 @@ public class MainMenuState extends BasicState {
 	private static final String VOLUME_UP = " + ";
 	private static final String VOUME_DOWN = " - ";
 
-	private Pong pong;
 	private ButtonManager manager = new ButtonManager();
 
 	private boolean showingSP = true; //whether or not the big single player button is being shown rn (if false, the small buttons are being shown)
 
 	public MainMenuState(Pong pong) {
-		this.pong = pong;
+		super(pong);
 
 		int buttonWidth = 250;
 		manager.addButton(new ImageButton(VSAI, Pong.SIZE.width / 2 - buttonWidth / 2, 60, buttonWidth, 85));
@@ -93,10 +93,8 @@ public class MainMenuState extends BasicState {
 			pong.stop();
 		} else if (manager.getButton(VOLUME_UP).isClicked()) {
 			Sound.increaseVolume();
-			Sound.boop.play();
 		} else if (manager.getButton(VOUME_DOWN).isClicked()) {
 			Sound.decreaseVolume();
-			Sound.boop.play();
 		}
 
 		if (showingSP) {
